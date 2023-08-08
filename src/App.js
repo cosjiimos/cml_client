@@ -18,23 +18,14 @@ import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRound
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import SendIcon from '@mui/icons-material/Send';
-
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import ImageSearchIcon from '@mui/icons-material/ImageSearch';
 const darkTheme = createTheme({
   palette: {
     mode: 'light',
   },
 });
-
-const cards = [1];
-
-
-
-
-
-
-
-
-
 
 
 
@@ -49,7 +40,37 @@ export default function Album () {
   // 현재 페이지에 맞는 이미지 선택
   const currentImages = allImages.slice(pageNum * 16, (pageNum + 1) * 16);
   const [selectedImage, setSelectedImage] = useState(null);
+  // 장바구니 이미지
+  const [cartImages, setcartImages] = useState([]);
+  const [showSelected, setShowSelected] = useState(false);
+  const [viewSelectedImages, setViewSelectedImages] = useState(false);
+
+
+  const handleViewSelectedImages = () => {
+    setViewSelectedImages(true);
+  };
   
+  const handleCloseSelectedImages = () => {
+    setViewSelectedImages(false);
+  };
+
+  const toggleSelectImage = (image) => {
+    if (cartImages.includes(image)) {
+      setcartImages(prev => prev.filter(img => img !== image));
+    } else {
+      setcartImages(prev => [...prev, image]);
+    }
+    console.log(cartImages)
+  };
+  
+  const showSelectedImages = () => {
+    setShowSelected(true);
+  };
+  
+  const showAllImages = () => {
+    setShowSelected(false);
+  };
+
   const handleUpClick = () => {
     setPageNum(pageNum - 1); 
   };
@@ -60,8 +81,6 @@ export default function Album () {
       setPageNum(prevNum => prevNum + 1);
     }
   };
-
-
 
   const imghandleOpen = (image) => {
     setSelectedImage(image);
@@ -74,7 +93,6 @@ export default function Album () {
   };
 
 
- 
   useEffect(() => {
     const loadImage = async () => {
       const image = await import('./images/cards_2063650.jpg');
@@ -97,14 +115,48 @@ export default function Album () {
       <main>
         <Container sx={{ py: 4}} maxWidth="false" >
           <Grid container spacing={0} justifyContent="flex-end">
-            <Grid item xs={1}>
+            <Grid item xs={1.5}>
               <Button
                 variant="outlined"
                 endIcon={<AddShoppingCartIcon/>}
-                sx={{ fontWeight: 'bold', width: '90px', height: '40px', color: 'gray', borderColor: 'gray', marginRight: '5px' }}
+                sx={{ fontWeight: 'bold', width: '90px', height: '40px', color: 'gray', borderColor: 'gray', marginRight: '5px' }} onClick={handleViewSelectedImages}
               >
                 Cart
               </Button>
+              <Dialog open={viewSelectedImages} onClose={handleCloseSelectedImages}  maxWidth="false " PaperProps={{
+                  style: {
+                    height: '100%', 
+                    width: '100%', 
+                  },
+                }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}></Box>
+                <Grid container spacing={6}>
+                  {cartImages.map((image, index) => (
+                    <Grid item xs={12} sm={4} md={4} lg={2} key={index}>
+                      <Card
+                        sx={{
+                          width: '90%',
+                          height: '240px',
+                          backgroundImage: `url(${image})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          margin: ' 20px'
+                        }}
+                      ><Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
+                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(image)}>
+                        <AddCircleOutlineIcon fontSize="small" />
+                      </Button>
+                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(image)}>
+                        <AutoFixHighIcon fontSize="small" />
+                      </Button>
+                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(image)}>
+                        <ImageSearchIcon fontSize="small" />
+                      </Button>
+                    </Box></Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Dialog>
               <IconButton onClick={handleUpClick} disabled={pageNum === 0}>
                 <KeyboardArrowUpRoundedIcon sx={{ fontSize: 40}} />
               </IconButton>
@@ -121,13 +173,21 @@ export default function Album () {
 
 
         <Container sx={{ py: 4 }} maxWidth={false}>
-          <Grid Grid container spacing={4}>
-            <Grid item xs={2}>
+          <Grid Grid container spacing={2}>
+          <Grid item xs={0.4}></Grid>
+            <Grid item xs={1.6}>
               <Card
-                sx={{ width: '360px', height: '240px', display: 'flex', flexDirection: 'column', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-                onClick={imghandleOpen}
-              ></Card>
-            <Box sx={{ mb: 4 }} />
+                sx={{ width: '360px', height: '240px', display: 'flex', flexDirection: 'column', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                  <Button variant="filled" sx={{ color: '#fff', fontWeight: 'bold' ,width : '10px'}} onClick={() => imghandleOpen(backgroundImage)}>
+                    <ImageSearchIcon fontSize="small" />
+                  </Button>
+                </Box>
+                <Dialog open={open} onClose={imghandleClose}>
+                  <img src={backgroundImage}  style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                </Dialog>
+              </Card>
+              <Box sx={{ mb: 4 }} />
             <Grid item>
               <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' }} onClick={() => setshowBackgroundButtons(!showBackgroundButtons)}>
                 background
@@ -218,24 +278,33 @@ export default function Album () {
                 Send
               </Button>
             </Grid>
-
-            <Dialog open={open} onClose={imghandleClose}>
-              <img src={backgroundImage}  style={{ maxWidth: '100%', maxHeight: '100%' }} />
-            </Dialog>
+            
+            
 
 
           </Grid>
-
-
-          <Grid item xs={10}>
+          <Grid item xs={0.5}></Grid>
+          <Grid item xs={9.5}>
             <Grid container spacing={3}>
               {currentImages .map((image, index) => (
               // 카드 크기에 맞춰서 줌인
-                <Grid item xs={3} key={index}>
-                  <Card
-                    sx={{ width: '100%', height: '240px', backgroundImage: `url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center' }} onClick={() => imghandleOpen(image)}
-                  ></Card>
-                </Grid>
+              <Grid item xs={3} key={index}>
+                <Card
+                  sx={{ width: '80%', height: '240px', backgroundImage: `url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center', border: cartImages.includes(image) ? '5px solid #CF4ECB' : 'none' }}               
+                >
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(image)}>
+                      <AddCircleOutlineIcon fontSize="small" />
+                    </Button>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(image)}>
+                      <AutoFixHighIcon fontSize="small" />
+                    </Button>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(image)}>
+                      <ImageSearchIcon fontSize="small" />
+                    </Button>
+                  </Box>
+                </Card>
+              </Grid>
               //  원본 이미지 보존
               // <Grid item xs={3} key={index}>
               //   <Card
