@@ -19,6 +19,8 @@ import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownR
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import SendIcon from '@mui/icons-material/Send';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import CloseIcon from '@mui/icons-material/Close';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ImageSearchIcon from '@mui/icons-material/ImageSearch';
 const darkTheme = createTheme({
@@ -37,6 +39,8 @@ export default function Album () {
   const allImages = imageContext.keys().map(imageContext);
   const [showBackgroundButtons, setshowBackgroundButtons] = useState(false);
   const [showFurnitureButtons, setshowFurnitureButtons] = useState(false);
+  //슬라이더값 send버튼 누르면 값 콘솔창에 보내기
+  
   // 현재 페이지에 맞는 이미지 선택
   const currentImages = allImages.slice(pageNum * 16, (pageNum + 1) * 16);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -44,7 +48,81 @@ export default function Album () {
   const [cartImages, setcartImages] = useState([]);
   const [showSelected, setShowSelected] = useState(false);
   const [viewSelectedImages, setViewSelectedImages] = useState(false);
+  //세부 파라미터 버튼
+  const [Back_controls, Back_setControls] = useState([
+    { name: 'Wall', disabled: false },
+    { name: 'Floor', disabled: false },
+    { name: 'Windowpane', disabled: false },
+    { name: 'Ceiling', disabled: false },
+    { name: 'Door', disabled: false },
+  ]);
+  const [Furn_controls, Furn_setControls] = useState([
+    { name: 'Sofa', disabled: false },
+    { name: 'Table', disabled: false },
+    { name: 'Cabinet', disabled: false },
+    { name: 'Chair', disabled: false },
+    { name: 'Shelf', disabled: false },
+  ]);
+  //슬라이더값 send버튼 누르면 값 콘솔창에 보내기
+  const [backSliderValues, setBackSliderValues] = useState(Array(Back_controls.length).fill(50));
+  const [furnSliderValues, setFurnSliderValues] = useState(Array(Furn_controls.length).fill(50));
+  const [backsavedValues, setbackSavedValues] = useState(Array(Back_controls.length).fill(50)); // 저장된 값 초기화
+  const [furnsavedValues, setfurnSavedValues] = useState(Array(Back_controls.length).fill(50)); // 저장된 값 초기화
 
+  const handleBackSliderChange = (index, event, newValue) => {
+    const newSliderValues = [...backSliderValues];
+    newSliderValues[index] = newValue;
+    setBackSliderValues(newSliderValues);
+
+  };
+  const handleFurnSliderChange = (index, event, newValue) => {
+    const newSliderValues = [...furnSliderValues];
+    newSliderValues[index] = newValue;
+    setFurnSliderValues(newSliderValues);
+  };
+
+  const handleSendClick = () => {
+    console.log('Back Controls:', backSliderValues);
+    console.log('Furn Controls:', furnSliderValues);
+  };
+
+
+  const Back_toggleSlider = (index) => {
+    const Back_updatedControls = [...Back_controls];
+    Back_updatedControls[index].disabled = !Back_updatedControls[index].disabled;
+    Back_updatedControls[index].active = !Back_updatedControls[index].active;
+    if (Back_controls[index].disabled) {
+      // 비활성화되면 현재 값을 저장하고 sliderValues에서는 null로 설정
+      const newSavedValues = [...backsavedValues];
+      newSavedValues[index] = backSliderValues[index];
+      setbackSavedValues(newSavedValues);
+      backSliderValues[index] = null;
+    } else {
+      // 활성화되면 저장된 값을 사용
+      backSliderValues[index] = backsavedValues[index];
+    }
+    setBackSliderValues(backSliderValues);
+
+    Back_setControls(Back_updatedControls);
+  };
+
+  const Furn_toggleSlider = (index) => {
+    const Furn_updatedControls = [...Furn_controls];
+    Furn_updatedControls[index].disabled = !Furn_updatedControls[index].disabled;
+    Furn_updatedControls[index].active = !Furn_updatedControls[index].active;
+    if (Furn_controls[index].disabled) {
+      // 비활성화되면 현재 값을 저장하고 sliderValues에서는 null로 설정
+      const newSavedValues = [...furnsavedValues];
+      newSavedValues[index] = furnSliderValues[index];
+      setfurnSavedValues(newSavedValues);
+      furnSliderValues[index] = null;
+    } else {
+      // 활성화되면 저장된 값을 사용
+      furnSliderValues[index] = furnsavedValues[index];
+    }
+    setFurnSliderValues(furnSliderValues);
+    Furn_setControls(Furn_updatedControls);
+  };
 
   const handleViewSelectedImages = () => {
     setViewSelectedImages(true);
@@ -53,6 +131,8 @@ export default function Album () {
   const handleCloseSelectedImages = () => {
     setViewSelectedImages(false);
   };
+
+  
 
   const toggleSelectImage = (image) => {
     if (cartImages.includes(image)) {
@@ -63,13 +143,6 @@ export default function Album () {
     console.log(cartImages)
   };
   
-  const showSelectedImages = () => {
-    setShowSelected(true);
-  };
-  
-  const showAllImages = () => {
-    setShowSelected(false);
-  };
 
   const handleUpClick = () => {
     setPageNum(pageNum - 1); 
@@ -105,13 +178,6 @@ export default function Album () {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      {/* <AppBar position="relative">
-        <Toolbar sx={{ backgroundColor: 'white' }}>
-          <Typography variant="h4" color="inherit" noWrap sx={{ textAlign: 'center', width: '100%', color : '#BE7A7B' , fontWeight : 'bold'}}>
-            Furnishing Pairing System
-          </Typography>
-        </Toolbar>
-      </AppBar> */}
       <main>
         <Container sx={{ py: 4}} maxWidth="false" >
           <Grid container spacing={0} justifyContent="flex-end">
@@ -129,7 +195,11 @@ export default function Album () {
                     width: '100%', 
                   },
                 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}></Box>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
+                  <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={handleCloseSelectedImages}>
+                    닫기
+                    <CloseIcon></CloseIcon>
+                  </Button></Box>
                 <Grid container spacing={6}>
                   {cartImages.map((image, index) => (
                     <Grid item xs={12} sm={4} md={4} lg={2} key={index}>
@@ -144,7 +214,11 @@ export default function Album () {
                         }}
                       ><Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
                       <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(image)}>
-                        <AddCircleOutlineIcon fontSize="small" />
+                        {cartImages.includes(image) ? (
+                          <RemoveCircleOutlineIcon fontSize="small" /> // 이미지가 선택된 경우
+                        ) : (
+                          <AddCircleOutlineIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
+                        )}
                       </Button>
                       <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(image)}>
                         <AutoFixHighIcon fontSize="small" />
@@ -196,35 +270,27 @@ export default function Album () {
             <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
             {showBackgroundButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링
             <>
-            <Grid item>
-              <Button variant="filled" sx={{ width: '130px', height: '25px', backgroundColor: '#000', color: '#fff', fontWeight: 'bold' }}>
-                Wall
-              </Button>
-              <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
-            </Grid>
-            <Grid item>
-              <Button variant="outlined" sx={{width: '130px', height: '25px',  backgroundColor: '#000', color: '#fff', fontWeight: 'bold' }}>
-                Floor
-              </Button>
-              <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
-            </Grid>
-            <Grid item>
-              <Button variant="outlined" sx={{width: '130px',height: '25px', height: '25px',   backgroundColor: '#000', color: '#fff', fontWeight: 'bold' }}>
-                Windowpane
-              </Button>
-              <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
-            </Grid>
-            <Grid item>
-              <Button variant="outlined" sx={{width: '130px', height: '25px',  backgroundColor: '#000', color: '#fff', fontWeight: 'bold' }}>
-                Ceiling
-              </Button>
-              <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
-            </Grid>
-            <Grid item>
-              <Button variant="outlined" sx={{ width: '130px', height: '25px', backgroundColor: '#000', color: '#fff', fontWeight: 'bold' }}>
-                Door
-              </Button>
-              <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
+            <Grid container>
+                  {Back_controls.map((control, index) => (
+                    <Grid item key={index}>
+                      <Button
+                        variant={control.disabled ? 'outlined' : 'filled'}
+                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#999' : '#000', color:  '#fff', borderColor :control.active ? '#999' : '#000', fontWeight: 'bold' }}
+                        onClick={() => Back_toggleSlider(index)}
+                      >
+                        {control.name}
+                      </Button>
+                      <Slider
+                        defaultValue={50}
+                        aria-label="Default"
+                        valueLabelDisplay="auto"
+                        size="small"
+                        sx={{ width: '360px', color: '#000' }}
+                        disabled={control.disabled}
+                        onChange={(event, newValue) => handleBackSliderChange(index, event, newValue)}
+                      />
+                    </Grid>
+                  ))}
             </Grid>
 
               <Box sx={{ mb:3 }} />
@@ -238,43 +304,34 @@ export default function Album () {
             <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
             {showFurnitureButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링
             <>
-            <Grid item>
-              <Button variant="filled" sx={{ width: '130px', height: '25px', backgroundColor: '#000', color: '#fff', fontWeight: 'bold' }}>
-                Sofa
-              </Button>
-              <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
+            <Grid container>
+                  {Furn_controls.map((control, index) => (
+                    <Grid item key={index}>
+                      <Button
+                        variant={control.disabled ? 'outlined' : 'filled'}
+                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#999' : '#000', color:  '#fff', borderColor :control.active ? '#999' : '#000', fontWeight: 'bold' }}
+                        onClick={() => Furn_toggleSlider(index)}
+                      >
+                        {control.name}
+                      </Button>
+                      <Slider
+                        defaultValue={50}
+                        aria-label="Default"
+                        valueLabelDisplay="auto"
+                        size="small"
+                        sx={{ width: '360px', color: '#000' }}
+                        disabled={control.disabled}
+                        onChange={(event, newValue) => handleFurnSliderChange(index, event, newValue)}
+                      />
+                    </Grid>
+                  ))}
             </Grid>
-            <Grid item>
-              <Button variant="outlined" sx={{width: '130px', height: '25px',  backgroundColor: '#000', color: '#fff', fontWeight: 'bold' }}>
-                Table
-              </Button>
-              <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
-            </Grid>
-            <Grid item>
-              <Button variant="outlined" sx={{width: '130px',height: '25px', height: '25px',   backgroundColor: '#000', color: '#fff', fontWeight: 'bold' }}>
-                Cabinet
-              </Button>
-              <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
-            </Grid>
-            <Grid item>
-              <Button variant="outlined" sx={{width: '130px', height: '25px',  backgroundColor: '#000', color: '#fff', fontWeight: 'bold' }}>
-                Chair
-              </Button>
-              <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
-            </Grid>
-            <Grid item>
-              <Button variant="outlined" sx={{ width: '130px', height: '25px', backgroundColor: '#000', color: '#fff', fontWeight: 'bold' }}>
-                Shelf
-              </Button>
-              <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} />
-            </Grid>
-
               <Box sx={{ mb: 2 }} />
             </>
            )}
             <Box sx={{ mb: 3 }} />
             <Grid item>
-              <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',marginLeft : '260px' }} endIcon={<SendIcon />}>
+              <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',marginLeft : '260px' }} endIcon={<SendIcon />} onClick={handleSendClick}>
                 Send
               </Button>
             </Grid>
@@ -294,7 +351,11 @@ export default function Album () {
                 >
                   <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
                     <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(image)}>
-                      <AddCircleOutlineIcon fontSize="small" />
+                    {cartImages.includes(image) ? (
+                        <RemoveCircleOutlineIcon fontSize="small" /> // 이미지가 선택된 경우
+                      ) : (
+                        <AddCircleOutlineIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
+                      )}
                     </Button>
                     <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(image)}>
                       <AutoFixHighIcon fontSize="small" />
@@ -313,7 +374,7 @@ export default function Album () {
               //   >
               //     <img src={image} alt={`Image ${index}`} style={{ maxWidth: '100%', maxHeight: '240px' }} />
               //    </Card>
-              // </Grid>
+              // </Grid>RemoveCircleOutlineIcon
               ))}
             </Grid>
             <Dialog open={open} onClose={imghandleClose}>
