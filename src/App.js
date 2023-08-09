@@ -39,7 +39,7 @@ export default function Album () {
   const [pageNum, setPageNum] = useState(0); // 현재 page num (0번부터 시작)
   const [backgroundImage, setBackgroundImage] = useState(null);
   const [open, setOpen] = useState(false);
-  const imageContext = require.context('./images', false, /\.(jpg|jpeg|png)$/);
+  const imageContext = require.context('./img', false, /\.(jpg|jpeg|png)$/);
   const allImages = imageContext.keys().map(imageContext);
   const [showBackgroundButtons, setshowBackgroundButtons] = useState(false);
   const [showFurnitureButtons, setshowFurnitureButtons] = useState(false);
@@ -96,8 +96,10 @@ export default function Album () {
         pageNum:pageNum,
         target_image_name : image
        });
-      const currentImages = response.data;
+      const currentImages = response.data.images;
       setServerImages(currentImages);
+      console.log('cI: ', serverImages)
+      console.log('SI: ', serverImages)
     } catch (error) {
       console.error('Error fetching images:', error);
     }
@@ -384,11 +386,11 @@ export default function Album () {
           <Grid item xs={0.5}></Grid>
           <Grid item xs={9.5}>
             <Grid container spacing={3}>
-              {currentImages .map((image, index) => (
+              {currentImages.map((image, index) => (
               // 카드 크기에 맞춰서 줌인
               <Grid item xs={3} key={index}>
                 <Card
-                  sx={{ width: '80%', height: '240px', backgroundImage: `url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center', border: cartImages.includes(image) ? '5px solid #CF4ECB' : 'none' }}               
+                  sx={{ width: '80%', height: '240px', backgroundImage: `url(./img/${image})`, backgroundSize: 'cover', backgroundPosition: 'center', border: cartImages.includes(image) ? '5px solid #CF4ECB' : 'none' }}               
                 >
                   <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
                     <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(image)}>
