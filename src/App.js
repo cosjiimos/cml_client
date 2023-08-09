@@ -23,12 +23,16 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ImageSearchIcon from '@mui/icons-material/ImageSearch';
+
+axios.defaults.baseURL = "http://166.104.34.158:5003";
+axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
+axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
+
 const darkTheme = createTheme({
   palette: {
     mode: 'light',
   },
 });
-
 
 
 export default function Album () {
@@ -69,6 +73,21 @@ export default function Album () {
   const [backsavedValues, setbackSavedValues] = useState(Array(Back_controls.length).fill(50)); // 저장된 값 초기화
   const [furnsavedValues, setfurnSavedValues] = useState(Array(Back_controls.length).fill(50)); // 저장된 값 초기화
 
+  async function sendWeight(image, back, furn) {
+    try {
+      const response = await axios.post('/save_back_slider_values', { 
+        target_image_name : image,
+        back_weight: back,
+        furn_weight: furn
+      });
+      const res = response.data; // JSON 응답에서 필요한 데이터 추출
+      console.log(res);
+    } catch (err) {
+      console.error(err);
+    }
+  } 
+
+
   const handleBackSliderChange = (index, event, newValue) => {
     const newSliderValues = [...backSliderValues];
     newSliderValues[index] = newValue;
@@ -84,6 +103,7 @@ export default function Album () {
   const handleSendClick = () => {
     console.log('Back Controls:', backSliderValues);
     console.log('Furn Controls:', furnSliderValues);
+    sendWeight(backgroundImage, backSliderValues, furnSliderValues)
   };
 
 
