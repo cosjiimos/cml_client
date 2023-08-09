@@ -142,6 +142,7 @@ export default function Album () {
   const Back_toggleSlider = (index) => {
     const Back_updatedControls = [...Back_controls];
     Back_updatedControls[index].disabled = !Back_updatedControls[index].disabled;
+    console.log(Back_updatedControls[index])
     Back_updatedControls[index].active = !Back_updatedControls[index].active;
     if (Back_controls[index].disabled) {
       // 비활성화되면 현재 값을 저장하고 sliderValues에서는 null로 설정
@@ -326,7 +327,7 @@ export default function Album () {
                     <Grid item key={index}>
                       <Button
                         variant={control.disabled ? 'outlined' : 'filled'}
-                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#999' : '#000', color:  '#fff', borderColor :control.active ? '#999' : '#000', fontWeight: 'bold' }}
+                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#000' : '#999', color:  '#fff', borderColor :control.active ? '#000' : '#999', fontWeight: 'bold' }}
                         onClick={() => Back_toggleSlider(index)}
                       >
                         {control.name}
@@ -360,7 +361,7 @@ export default function Album () {
                     <Grid item key={index}>
                       <Button
                         variant={control.disabled ? 'outlined' : 'filled'}
-                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#999' : '#000', color:  '#fff', borderColor :control.active ? '#999' : '#000', fontWeight: 'bold' }}
+                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#000' : '#999', color:  '#fff', borderColor :control.active ? '#000' : '#999', fontWeight: 'bold' }}
                         onClick={() => Furn_toggleSlider(index)}
                       >
                         {control.name}
