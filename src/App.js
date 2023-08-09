@@ -24,7 +24,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ImageSearchIcon from '@mui/icons-material/ImageSearch';
 
-axios.defaults.baseURL = "http://166.104.34.158:5003";
+axios.defaults.baseURL = "http://166.104.34.158:5002";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -46,37 +46,39 @@ export default function Album () {
   //슬라이더값 send버튼 누르면 값 콘솔창에 보내기
   
   // 현재 페이지에 맞는 이미지 선택
-  const currentImages = allImages.slice(pageNum * 16, (pageNum + 1) * 16);
+  const [serverImages, setServerImages] = useState([]);
+  const currentImages = serverImages.slice(pageNum * 16, (pageNum + 1) * 16);
   const [selectedImage, setSelectedImage] = useState(null);
+  // const currentImages = allImages.slice(pageNum * 16, (pageNum + 1) * 16);
+
   // 장바구니 이미지
   const [cartImages, setcartImages] = useState([]);
   const [showSelected, setShowSelected] = useState(false);
   const [viewSelectedImages, setViewSelectedImages] = useState(false);
   //세부 파라미터 버튼
   const [Back_controls, Back_setControls] = useState([
-    { name: 'Wall', disabled: false },
-    { name: 'Floor', disabled: false },
-    { name: 'Windowpane', disabled: false },
-    { name: 'Ceiling', disabled: false },
-    { name: 'Door', disabled: false },
+    { name: 'Wall', disabled: true },
+    { name: 'Floor', disabled: true },
+    { name: 'Windowpane', disabled: true },
+    { name: 'Ceiling', disabled: true },
+    { name: 'Door', disabled: true },
   ]);
   const [Furn_controls, Furn_setControls] = useState([
-    { name: 'Sofa', disabled: false },
-    { name: 'Table', disabled: false },
-    { name: 'Cabinet', disabled: false },
-    { name: 'Chair', disabled: false },
-    { name: 'Shelf', disabled: false },
+    { name: 'Sofa', disabled: true },
+    { name: 'Table', disabled: true },
+    { name: 'Cabinet', disabled: true },
+    { name: 'Chair', disabled: true },
+    { name: 'Shelf', disabled: true },
   ]);
   //슬라이더값 send버튼 누르면 값 콘솔창에 보내기
-  const [backSliderValues, setBackSliderValues] = useState(Array(Back_controls.length).fill(50));
-  const [furnSliderValues, setFurnSliderValues] = useState(Array(Furn_controls.length).fill(50));
-  const [backsavedValues, setbackSavedValues] = useState(Array(Back_controls.length).fill(50)); // 저장된 값 초기화
-  const [furnsavedValues, setfurnSavedValues] = useState(Array(Back_controls.length).fill(50)); // 저장된 값 초기화
+  const [backSliderValues, setBackSliderValues] = useState(Array(Back_controls.length).fill(null));
+  const [furnSliderValues, setFurnSliderValues] = useState(Array(Furn_controls.length).fill(null));
+  const [backsavedValues, setbackSavedValues] = useState(Array(Back_controls.length).fill(null)); // 저장된 값 초기화
+  const [furnsavedValues, setfurnSavedValues] = useState(Array(Back_controls.length).fill(null)); // 저장된 값 초기화
 
-  async function sendWeight(image, back, furn) {
+  async function sendWeight(back, furn) {
     try {
       const response = await axios.post('/save_back_slider_values', { 
-        target_image_name : image,
         back_weight: back,
         furn_weight: furn
       });
@@ -86,6 +88,25 @@ export default function Album () {
       console.error(err);
     }
   } 
+
+  // 이미지를 가져오는 함수
+  async function fetchImages(pageNum, image) {
+    try {
+      const response = await axios.post('/get_images', { 
+        pageNum:pageNum,
+        target_image_name : image
+       });
+      const currentImages = response.data;
+      setServerImages(currentImages);
+    } catch (error) {
+      console.error('Error fetching images:', error);
+    }
+  }
+
+  // pageNum이 변경될 때마다 fetchImages를 호출
+  useEffect(() => {
+    fetchImages(pageNum, backgroundImage);
+  }, [pageNum]);
 
 
   const handleBackSliderChange = (index, event, newValue) => {
@@ -103,7 +124,8 @@ export default function Album () {
   const handleSendClick = () => {
     console.log('Back Controls:', backSliderValues);
     console.log('Furn Controls:', furnSliderValues);
-    sendWeight(backgroundImage, backSliderValues, furnSliderValues)
+    sendWeight(backSliderValues, furnSliderValues);
+    fetchImages(pageNum, backgroundImage);
   };
 
 
@@ -152,7 +174,6 @@ export default function Album () {
     setViewSelectedImages(false);
   };
 
-  
 
   const toggleSelectImage = (image) => {
     if (cartImages.includes(image)) {
@@ -176,7 +197,7 @@ export default function Album () {
   };
 
   const imghandleOpen = (image) => {
-    setSelectedImage(image);
+    setServerImages(image);
     setOpen(true);
   };
 
