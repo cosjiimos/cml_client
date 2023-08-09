@@ -43,11 +43,11 @@ export default function Album () {
   const allImages = imageContext.keys().map(imageContext);
   const [showBackgroundButtons, setshowBackgroundButtons] = useState(false);
   const [showFurnitureButtons, setshowFurnitureButtons] = useState(false);
+  
   //슬라이더값 send버튼 누르면 값 콘솔창에 보내기
   
   // 현재 페이지에 맞는 이미지 선택
-  const [serverImages, setServerImages] = useState([]);
-  const currentImages = serverImages.slice(pageNum * 16, (pageNum + 1) * 16);
+  const [currentImages, setCurrentImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   // const currentImages = allImages.slice(pageNum * 16, (pageNum + 1) * 16);
 
@@ -96,14 +96,22 @@ export default function Album () {
         pageNum:pageNum,
         target_image_name : image
        });
-      const currentImages = response.data.images;
-      setServerImages(currentImages);
-      console.log('cI: ', serverImages)
-      console.log('SI: ', serverImages)
+       const imagesFromServer = response.data.images;
+       console.log('cI: ', imagesFromServer);
+
+       setCurrentImages(imagesFromServer);
+
     } catch (error) {
       console.error('Error fetching images:', error);
     }
   }
+
+  const [currentImagePaths, setCurrentImagesPaths] = useState([])
+  useEffect(()=>{
+    const tmpImagePaths = currentImages.map(imageName => require(`./img/${imageName}`))
+    setCurrentImagesPaths(tmpImagePaths)
+    console.log(tmpImagePaths)
+  },[currentImages])
 
   // pageNum이 변경될 때마다 fetchImages를 호출
   useEffect(() => {
@@ -199,7 +207,7 @@ export default function Album () {
   };
 
   const imghandleOpen = (image) => {
-    setServerImages(image);
+    // setServerImages(image);
     setOpen(true);
   };
 
@@ -211,7 +219,7 @@ export default function Album () {
 
   useEffect(() => {
     const loadImage = async () => {
-      const image = await import('./images/cards_2063650.jpg');
+      const image = await import('./images/cards_2134317.jpg');
       setBackgroundImage(image.default);
     };
     loadImage();
@@ -386,24 +394,24 @@ export default function Album () {
           <Grid item xs={0.5}></Grid>
           <Grid item xs={9.5}>
             <Grid container spacing={3}>
-              {currentImages.map((image, index) => (
+              {currentImagePaths.map((imagePath, index) => (
               // 카드 크기에 맞춰서 줌인
               <Grid item xs={3} key={index}>
                 <Card
-                  sx={{ width: '80%', height: '240px', backgroundImage: `url(./img/${image})`, backgroundSize: 'cover', backgroundPosition: 'center', border: cartImages.includes(image) ? '5px solid #CF4ECB' : 'none' }}               
+                  sx={{ width: '80%', height: '240px', backgroundImage: `url(${imagePath})`, backgroundSize: 'cover', backgroundPosition: 'center', border: cartImages.includes(imagePath) ? '5px solid #CF4ECB' : 'none' }}               
                 >
                   <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
-                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(image)}>
-                    {cartImages.includes(image) ? (
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(imagePath)}>
+                    {cartImages.includes(imagePath) ? (
                         <RemoveCircleOutlineIcon fontSize="small" /> // 이미지가 선택된 경우
                       ) : (
                         <AddCircleOutlineIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
                       )}
                     </Button>
-                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(image)}>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(imagePath)}>
                       <AutoFixHighIcon fontSize="small" />
                     </Button>
-                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(image)}>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(imagePath)}>
                       <ImageSearchIcon fontSize="small" />
                     </Button>
                   </Box>
