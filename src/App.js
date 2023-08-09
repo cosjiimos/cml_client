@@ -54,24 +54,24 @@ export default function Album () {
   const [viewSelectedImages, setViewSelectedImages] = useState(false);
   //세부 파라미터 버튼
   const [Back_controls, Back_setControls] = useState([
-    { name: 'Wall', disabled: false },
-    { name: 'Floor', disabled: false },
-    { name: 'Windowpane', disabled: false },
-    { name: 'Ceiling', disabled: false },
-    { name: 'Door', disabled: false },
+    { name: 'Wall', disabled: true },
+    { name: 'Floor', disabled: true },
+    { name: 'Windowpane', disabled: true },
+    { name: 'Ceiling', disabled: true },
+    { name: 'Door', disabled: true },
   ]);
   const [Furn_controls, Furn_setControls] = useState([
-    { name: 'Sofa', disabled: false },
-    { name: 'Table', disabled: false },
-    { name: 'Cabinet', disabled: false },
-    { name: 'Chair', disabled: false },
-    { name: 'Shelf', disabled: false },
+    { name: 'Sofa', disabled: true },
+    { name: 'Table', disabled: true },
+    { name: 'Cabinet', disabled: true },
+    { name: 'Chair', disabled: true },
+    { name: 'Shelf', disabled: true },
   ]);
   //슬라이더값 send버튼 누르면 값 콘솔창에 보내기
-  const [backSliderValues, setBackSliderValues] = useState(Array(Back_controls.length).fill(50));
-  const [furnSliderValues, setFurnSliderValues] = useState(Array(Furn_controls.length).fill(50));
-  const [backsavedValues, setbackSavedValues] = useState(Array(Back_controls.length).fill(50)); // 저장된 값 초기화
-  const [furnsavedValues, setfurnSavedValues] = useState(Array(Back_controls.length).fill(50)); // 저장된 값 초기화
+  const [backSliderValues, setBackSliderValues] = useState(Array(Back_controls.length).fill(null));
+  const [furnSliderValues, setFurnSliderValues] = useState(Array(Furn_controls.length).fill(null));
+  const [backsavedValues, setbackSavedValues] = useState(Array(Back_controls.length).fill(null)); // 저장된 값 초기화
+  const [furnsavedValues, setfurnSavedValues] = useState(Array(Back_controls.length).fill(null)); // 저장된 값 초기화
 
   async function sendWeight(image, back, furn) {
     try {
@@ -110,6 +110,7 @@ export default function Album () {
   const Back_toggleSlider = (index) => {
     const Back_updatedControls = [...Back_controls];
     Back_updatedControls[index].disabled = !Back_updatedControls[index].disabled;
+    console.log(Back_updatedControls[index])
     Back_updatedControls[index].active = !Back_updatedControls[index].active;
     if (Back_controls[index].disabled) {
       // 비활성화되면 현재 값을 저장하고 sliderValues에서는 null로 설정
@@ -295,7 +296,7 @@ export default function Album () {
                     <Grid item key={index}>
                       <Button
                         variant={control.disabled ? 'outlined' : 'filled'}
-                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#999' : '#000', color:  '#fff', borderColor :control.active ? '#999' : '#000', fontWeight: 'bold' }}
+                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#000' : '#999', color:  '#fff', borderColor :control.active ? '#000' : '#999', fontWeight: 'bold' }}
                         onClick={() => Back_toggleSlider(index)}
                       >
                         {control.name}
@@ -329,7 +330,7 @@ export default function Album () {
                     <Grid item key={index}>
                       <Button
                         variant={control.disabled ? 'outlined' : 'filled'}
-                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#999' : '#000', color:  '#fff', borderColor :control.active ? '#999' : '#000', fontWeight: 'bold' }}
+                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#000' : '#999', color:  '#fff', borderColor :control.active ? '#000' : '#999', fontWeight: 'bold' }}
                         onClick={() => Furn_toggleSlider(index)}
                       >
                         {control.name}
