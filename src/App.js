@@ -24,7 +24,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ImageSearchIcon from '@mui/icons-material/ImageSearch';
 
-axios.defaults.baseURL = "http://166.104.34.158:5002";
+axios.defaults.baseURL = "http://166.104.34.158:5004";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -40,6 +40,7 @@ export default function Album () {
   const [backgroundImage, setBackgroundImage] = useState(null);
   const [open, setOpen] = useState(false);
   const imageContext = require.context('./img', false, /\.(jpg|jpeg|png)$/);
+  // console.log(imageContext)
   const allImages = imageContext.keys().map(imageContext);
   const [showBackgroundButtons, setshowBackgroundButtons] = useState(false);
   const [showFurnitureButtons, setshowFurnitureButtons] = useState(false);
@@ -47,7 +48,8 @@ export default function Album () {
   
   // 현재 페이지에 맞는 이미지 선택
   const [serverImages, setServerImages] = useState([]);
-  const currentImages = serverImages.slice(pageNum * 16, (pageNum + 1) * 16);
+  // const currentImages = serverImages.slice(pageNum * 16, (pageNum + 1) * 16);
+  const currentImages = serverImages;
   const [selectedImage, setSelectedImage] = useState(null);
   // const currentImages = allImages.slice(pageNum * 16, (pageNum + 1) * 16);
 
