@@ -318,9 +318,9 @@ export default function Album () {
                     <ImageSearchIcon fontSize="small" />
                   </Button>
                 </Box>
-                <Dialog open={open} onClose={imghandleClose}>
-                  <img src={backgroundImage}  style={{ maxWidth: '100%', maxHeight: '100%' }} />
-                </Dialog>
+                <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="lg">
+    <img src={backgroundImage} style={{ width: '100%', height: '100%' }} />
+</Dialog>
               </Card>
               <Box sx={{ mb: 4 }} />
             <Grid item>
@@ -440,16 +440,14 @@ export default function Album () {
               // </Grid>RemoveCircleOutlineIcon
               ))}
             </Grid>
-            <Dialog open={open} onClose={imghandleClose}>
-              <img src={selectedImage}  style={{ maxWidth: '100%', maxHeight: '100%' }} />
+
+            <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="lg">
+              <img src={selectedImage} style={{ width: '100%', height: '100%' }} />
               {/* <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Background </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Floor : 2500k ~3800k </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Windowpane :  </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Ceiling :  </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Door  :  </Box> */}
-
-              
-
+                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Floor : 2500k ~3800k </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Windowpane :  </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Ceiling :  </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Door  :  </Box> */}
             </Dialog>
           </Grid>
       </Grid>
