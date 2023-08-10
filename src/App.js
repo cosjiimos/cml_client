@@ -223,7 +223,7 @@ export default function Album () {
 
   useEffect(() => {
     const loadImage = async () => {
-      const image = await import('./img/cards_5294632.jpg');
+      const image = await import('./img/cards_1181065.jpg');
       setBackgroundImage(image.default);
     };
     loadImage();
@@ -318,13 +318,13 @@ export default function Album () {
                     <ImageSearchIcon fontSize="small" />
                   </Button>
                 </Box>
-                <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="lg">
-    <img src={backgroundImage} style={{ width: '100%', height: '100%' }} />
-</Dialog>
+                <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="md">
+                    <img src={backgroundImage} style={{ width: '100%', height: '100%' }} />
+                </Dialog>
               </Card>
               <Box sx={{ mb: 4 }} />
             <Grid item>
-              <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' }} onClick={() => setshowBackgroundButtons(!showBackgroundButtons)}>
+              <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' }} onClick={() => {setshowBackgroundButtons(!showBackgroundButtons); setBackSliderValues(Array(Back_controls.length).fill(null));}}>
                 background
               </Button>
             </Grid>
@@ -359,9 +359,8 @@ export default function Album () {
             </>
            )}
             <Grid item>
-              <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' }} onClick={() => setshowFurnitureButtons(!showFurnitureButtons)}>
-                Furniture
-              </Button>
+            <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' }} onClick={() => { setshowFurnitureButtons(!showFurnitureButtons); setFurnSliderValues(Array(Furn_controls.length).fill(null));}}>
+            Furniture</Button>
             </Grid>
             {!showFurnitureButtons && <Slider defaultValue={0} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} max={50} min={-50} onChange={handleFurnMainSliderChange}/>}
             {showFurnitureButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링
@@ -441,7 +440,7 @@ export default function Album () {
               ))}
             </Grid>
 
-            <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="lg">
+            <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="md">
               <img src={selectedImage} style={{ width: '100%', height: '100%' }} />
               {/* <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Background </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Floor : 2500k ~3800k </Box>
