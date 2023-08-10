@@ -69,6 +69,8 @@ export default function Album () {
   const [furnSliderValues, setFurnSliderValues] = useState(Array(Furn_controls.length).fill(null));
   const [backsavedValues, setbackSavedValues] = useState(Array(Back_controls.length).fill(null)); // 저장된 값 초기화
   const [furnsavedValues, setfurnSavedValues] = useState(Array(Back_controls.length).fill(null)); // 저장된 값 초기화
+  const [mainBackSliderValue, setMainBackSliderValue] = useState(null);
+  const [mainFurnSliderValue, setMainFurnSliderValue] = useState(null);
   async function sendWeight(back, furn) {
     try {
       const response = await axios.post('/save_back_slider_values', { 
@@ -129,7 +131,16 @@ export default function Album () {
     fetchImages(pageNum, backgroundImage);
   };
 
-
+  //메인 슬라이더 값 조정
+  const handleBackMainSliderChange = (event, newValue) => {
+    setMainBackSliderValue(newValue);
+    setBackSliderValues(Array(Back_controls.length).fill(newValue)); // 모든 backSliderValues를 newValue로 설정
+  };
+  const handleFurnMainSliderChange = (event, newValue) => {
+    setMainFurnSliderValue(newValue);
+    setFurnSliderValues(Array(Back_controls.length).fill(newValue)); // 모든 backSliderValues를 newValue로 설정
+  };
+  //세부 슬라이더 값 조정
   const Back_toggleSlider = (index) => {
     const Back_updatedControls = [...Back_controls];
     Back_updatedControls[index].disabled = !Back_updatedControls[index].disabled;
@@ -317,7 +328,7 @@ export default function Album () {
                 background
               </Button>
             </Grid>
-            {!showBackgroundButtons &&<Slider defaultValue={0} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} max={50} min={-50}/>}
+            {!showBackgroundButtons &&<Slider defaultValue={0} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} max={50} min={-50} onChange={handleBackMainSliderChange}/>}
             {showBackgroundButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링
             <>
             <Grid container><Box sx={{ mb: 2 }} />
@@ -352,7 +363,7 @@ export default function Album () {
                 Furniture
               </Button>
             </Grid>
-            {!showFurnitureButtons && <Slider defaultValue={0} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} max={50} min={-50}/>}
+            {!showFurnitureButtons && <Slider defaultValue={0} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} max={50} min={-50} onChange={handleFurnMainSliderChange}/>}
             {showFurnitureButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링
             <><Box sx={{ mb: 2 }} />
             <Grid container>
