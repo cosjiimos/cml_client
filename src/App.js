@@ -51,18 +51,18 @@ export default function Album () {
   const [viewSelectedImages, setViewSelectedImages] = useState(false);
   //세부 파라미터 버튼
   const [Back_controls, Back_setControls] = useState([
-    { name: 'Wall', disabled: true },
-    { name: 'Floor', disabled: true },
-    { name: 'Windowpane', disabled: true },
-    { name: 'Ceiling', disabled: true },
-    { name: 'Door', disabled: true },
+    { name: 'Wall', disabled: true ,value: 0 },
+    { name: 'Floor', disabled: true ,value: 0 },
+    { name: 'Windowpane', disabled: true ,value: 0 },
+    { name: 'Ceiling', disabled: true ,value: 0 },
+    { name: 'Door', disabled: true ,value: 0 },
   ]);
   const [Furn_controls, Furn_setControls] = useState([
-    { name: 'Sofa', disabled: true },
-    { name: 'Table', disabled: true },
-    { name: 'Cabinet', disabled: true },
-    { name: 'Chair', disabled: true },
-    { name: 'Shelf', disabled: true },
+    { name: 'Sofa', disabled: true  ,value: 0 },
+    { name: 'Table', disabled: true ,value: 0 },
+    { name: 'Cabinet', disabled: true ,value: 0 },
+    { name: 'Chair', disabled: true ,value: 0 },
+    { name: 'Shelf', disabled: true ,value: 0 },
   ]);
   //슬라이더값 send버튼 누르면 값 콘솔창에 보내기
   const [backSliderValues, setBackSliderValues] = useState(Array(Back_controls.length).fill(null));
@@ -83,7 +83,7 @@ export default function Album () {
         target_image_name : image
        });
        const imagesFromServer = response.data.images;
-       console.log('cI: ', imagesFromServer);
+      //  console.log('cI: ', imagesFromServer);
 
        setCurrentImages(imagesFromServer);
 
@@ -222,7 +222,21 @@ export default function Album () {
   
   }, []);
 
+  //Target Image 변경
+  const loadImage = (url) => {
+    const extractedUrl = url.match(/\((.*?)\)/)[1];
+    const fileName = extractedUrl.substring(extractedUrl.lastIndexOf('/') + 1).split('.')[0] + '.jpg';
+    console.log(fileName); 
+    const imgpath = require(`./img/${fileName}`)
+    console.log('imgPath',imgpath)
+    setBackgroundImage(imgpath);
 
+    const Furn_newControls = Furn_controls.map(control => ({ ...control, disabled: true, value: 0 }));
+    Furn_setControls(Furn_newControls);
+
+    const Back_newControls = Back_controls.map(control => ({ ...control, disabled: true, value: 0 }));
+    Back_setControls(Back_newControls);
+  };
 
 
 
@@ -411,7 +425,7 @@ export default function Album () {
                         <AddCircleOutlineIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
                       )}
                     </Button>
-                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(imagePath)}>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => loadImage(`url(${imagePath})`)}>
                       <AutoFixHighIcon fontSize="small" />
                     </Button>
                     <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(imagePath)}>
