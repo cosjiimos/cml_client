@@ -25,8 +25,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ImageSearchIcon from '@mui/icons-material/ImageSearch';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
-axios.defaults.baseURL = "http://166.104.34.158:5005";
+axios.defaults.baseURL = "http://166.104.34.158:5006";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -235,14 +236,13 @@ export default function Album () {
   // 잘 나와요 : cards_5294632
   // 세민 궁금해요 : cards_21561263, cards_20394197 cards_12137732
   // 유경 궁금해요 : cards_8486233 cards_17760123 cards_4143928 cards_10687665
-
-  useEffect(() => {
-    const loadImage = async () => {
-      const image = await import('./img/cards_6573235.jpg');
-      setBackgroundImage(image.default);
-    };
-    loadImage();
+  const loadDefaultImage = async () => {
+    const image = await import('./img/cards_5294632.jpg');
+    setBackgroundImage(image.default);
+  };
   
+  useEffect(() => {
+    loadDefaultImage();
   }, []);
 
   //Target Image 변경
@@ -289,6 +289,7 @@ export default function Album () {
                   <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={handleCloseSelectedImages}>
                     <CloseIcon></CloseIcon>
                   </Button></Box>
+                  
                 <Grid container spacing={6}>
                   {cartImages.map((image, index) => (
                     <Grid item xs={12} sm={4} md={4} lg={2} key={index}>
@@ -327,6 +328,7 @@ export default function Album () {
               <IconButton onClick={handleDownClick}>
                 <KeyboardArrowDownRoundedIcon sx={{ fontSize: 40 }} />
               </IconButton>
+              
             </Grid>
             {/* <Grid item xs={0.5}>
               <Divider orientation="vertical" />
@@ -334,12 +336,16 @@ export default function Album () {
           </Grid>           
         </Container>
 
+        <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '100px' }}>
+            <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={loadDefaultImage}>
+              <RestartAltIcon></RestartAltIcon>
+        </Button></Box>
 
-
-        <Container sx={{ py: 4 }} maxWidth={false}>
+        <Container sx={{ py: 1 }} maxWidth={false}>
           <Grid Grid container spacing={2}>
           <Grid item xs={0.4}></Grid>
             <Grid item xs={1.6}>
+              
               <Card
                 sx={{ width: '360px', height: '240px', display: 'flex', flexDirection: 'column', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
