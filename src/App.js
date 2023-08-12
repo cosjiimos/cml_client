@@ -73,22 +73,14 @@ export default function Album () {
   const [furnsavedValues, setfurnSavedValues] = useState(Array(Back_controls.length).fill(null)); // 저장된 값 초기화
   const [mainBackSliderValue, setMainBackSliderValue] = useState(null);
   const [mainFurnSliderValue, setMainFurnSliderValue] = useState(null);
-  async function sendWeight(back, furn) {
-    try {
-      const response = await axios.post('/save_back_slider_values', { 
-        back_weight: back,
-        furn_weight: furn
-      });
-      const res = response.data; // JSON 응답에서 필요한 데이터 추출
-      console.log(res);
-    } catch (err) {
-      console.error(err);
-    }
-  } 
+
+
   // 이미지를 가져오는 함수
-  async function fetchImages(pageNum, image) {
+  async function fetchImages(back, furn, pageNum, image) {
     try {
       const response = await axios.post('/get_images', { 
+        back_weight: back,
+        furn_weight: furn,
         pageNum:pageNum,
         target_image_name : image
        });
@@ -124,7 +116,7 @@ export default function Album () {
 
   // pageNum이 변경될 때마다 fetchImages를 호출
   useEffect(() => {
-    fetchImages(pageNum, backgroundImage);
+    fetchImages(backSliderValues, furnSliderValues, pageNum, backgroundImage);
   }, [pageNum]);
 
 
@@ -143,8 +135,7 @@ export default function Album () {
   const handleSendClick = () => {
     console.log('Back Controls:', backSliderValues);
     console.log('Furn Controls:', furnSliderValues);
-    sendWeight(backSliderValues, furnSliderValues);
-    fetchImages(pageNum, backgroundImage);
+    fetchImages(backSliderValues, furnSliderValues, pageNum, backgroundImage);
   };
 
   //메인 슬라이더 값 조정
@@ -227,6 +218,7 @@ export default function Album () {
 
   const imghandleOpen = (image) => {
     setSelectedImage(image);
+    console.log(image) //이거를 가져와 셈아
     setOpen(true);
   };
 
@@ -246,7 +238,7 @@ export default function Album () {
 
   useEffect(() => {
     const loadImage = async () => {
-      const image = await import('./img/cards_5294632.jpg');
+      const image = await import('./img/cards_6573235.jpg');
       setBackgroundImage(image.default);
     };
     loadImage();
@@ -507,11 +499,11 @@ export default function Album () {
 
             <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="md">
               <img src={selectedImage} style={{ width: '100%', height: '100%' }} />
-              {/* <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Background </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Background </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Floor : 2500k ~3800k </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Windowpane :  </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Ceiling :  </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Door  :  </Box> */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Door  :  </Box>
             </Dialog>
           </Grid>
       </Grid>
