@@ -86,28 +86,51 @@ export default function Album () {
        });
        const imagesFromServer = response.data.images;
       //  console.log('cI: ', imagesFromServer);
-
        setCurrentImages(imagesFromServer);
 
     } catch (error) {
       console.error('Error fetching images:', error);
     }
+  };
+
+  //시뮬레이션 이미지와 슬라이더 바의 값을 가져오는 함슈
+  async function SimulationDataToServer (simulImage, cctValues){
+    try {
+      const response = await axios.post('/simulation',{
+        simulImage: simulImage,
+        cctValues: cctValues,
+      });
+      console.log(response.data)
+
+  } catch (error) {
+    console.error('Error fetching images:', error);
   }
+};
+
+
 
 //시뮬레이션 
-//시뮬레이션 이미지와 슬라이더 바의 값을 가져오는 함슈
-
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogImage, setDialogImage] = useState(null);
+  const [simsliderValue, setSimsliderValue] = useState(null);
+
+  useEffect(() => {
+    SimulationDataToServer(dialogImage, simsliderValue); // simsliderValue 값이 변경될 때마다 서버로 전송
+  }, [simsliderValue, dialogImage]);
+
+  const handleSimulationChange = (event, newValue) => {
+    setSimsliderValue(newValue);
+  };
+
   const handleDialogOpen = (imagePath) => {
     setDialogImage(imagePath);
     setOpenDialog(true);
+    SimulationDataToServer(imagePath, simsliderValue);
   };
   
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
-
 
   const [currentImagePaths, setCurrentImagesPaths] = useState([])
   useEffect(()=>{
@@ -576,11 +599,19 @@ const handleFurnitureButtonClick = () => {
                       </Card>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center',  flex: 1 }}>
                       <Typography variant="h6" sx={{ marginBottom: '20px' }}>2850K 7500k</Typography> {/* 최소값 표시 */}
-        <Slider defaultValue={2850} aria-label="Default" valueLabelDisplay="auto" size="large" sx={{ width: '360px', color: '#000' }} max={7500} min={2850}
-                          marks={[
-                          { value: 2850, label: '2850k : 노래요' },
-                          { value: 7500, label: '7500k : 퍼래요' },
-                        ]} />
+                      <Slider 
+                      value={simsliderValue}
+                      onChange={handleSimulationChange} 
+                      defaultValue={2850}
+                      aria-label="Default" 
+                      valueLabelDisplay="auto" 
+                      size="large" 
+                      sx={{ width: '360px', color: '#000' }} 
+                      max={7500} min={2850}
+                      marks={[
+                      { value: 2850, label: '2850k : 노래요' },
+                      { value: 7500, label: '7500k : 퍼래요' },
+                    ]} />
                       </Box>
                     </Box>
                   </Box>
