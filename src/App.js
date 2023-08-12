@@ -5,6 +5,7 @@ import CardActions from '@mui/material/CardActions';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import Dialog from '@mui/material/Dialog';
+import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 // import Modal  from '@mui/material/Modal ';
 import Slider from '@mui/material/Slider';
@@ -18,13 +19,14 @@ import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRound
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import SendIcon from '@mui/icons-material/Send';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ImageSearchIcon from '@mui/icons-material/ImageSearch';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 
-axios.defaults.baseURL = "http://166.104.34.158:5004";
+axios.defaults.baseURL = "http://166.104.34.158:5005";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -99,6 +101,20 @@ export default function Album () {
       console.error('Error fetching images:', error);
     }
   }
+
+//시뮬레이션 
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogImage, setDialogImage] = useState(null);
+  const handleDialogOpen = (imagePath) => {
+    setDialogImage(imagePath);
+    setOpenDialog(true);
+  };
+  
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
+
+
   const [currentImagePaths, setCurrentImagesPaths] = useState([])
   useEffect(()=>{
     const tmpImagePaths = currentImages.map(imageName => require(`./img/${imageName}`))
@@ -218,8 +234,15 @@ export default function Album () {
   const imghandleClose = () => {
     setOpen(false);
   };
+
+
+
+
+
+
   // 잘 나와요 : cards_5294632
   // 세민 궁금해요 : cards_21561263, cards_20394197 cards_12137732
+  // 유경 궁금해요 : cards_8486233 cards_17760123 cards_4143928 cards_10687665
 
   useEffect(() => {
     const loadImage = async () => {
@@ -272,7 +295,6 @@ export default function Album () {
                 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
                   <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={handleCloseSelectedImages}>
-                    닫기
                     <CloseIcon></CloseIcon>
                   </Button></Box>
                 <Grid container spacing={6}>
@@ -288,19 +310,20 @@ export default function Album () {
                           margin: ' 20px'
                         }}
                       ><Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
-                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(image)}>
-                        {cartImages.includes(image) ? (
-                          <RemoveCircleOutlineIcon fontSize="small" /> // 이미지가 선택된 경우
-                        ) : (
-                          <AddCircleOutlineIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
-                        )}
-                      </Button>
-                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(image)}>
-                        <AutoFixHighIcon fontSize="small" />
-                      </Button>
                       <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(image)}>
                         <ImageSearchIcon fontSize="small" />
                       </Button>
+                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(image)}>
+                        {cartImages.includes(image) ? (
+                          <RemoveShoppingCartIcon fontSize="small" /> // 이미지가 선택된 경우
+                        ) : (
+                          <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
+                        )}
+                      </Button>
+                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }}>
+                        <AutoFixHighIcon fontSize="small" />
+                      </Button>
+                      
                     </Box></Card>
                     </Grid>
                   ))}
@@ -426,19 +449,47 @@ export default function Album () {
                   sx={{ width: '80%', height: '240px', backgroundImage: `url(${imagePath})`, backgroundSize: 'cover', backgroundPosition: 'center', border: cartImages.includes(imagePath) ? '5px solid #CF4ECB' : 'none' }}               
                 >
                   <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
-                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(imagePath)}>
-                    {cartImages.includes(imagePath) ? (
-                        <RemoveCircleOutlineIcon fontSize="small" /> // 이미지가 선택된 경우
-                      ) : (
-                        <AddCircleOutlineIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
-                      )}
-                    </Button>
+                    
                     <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => loadImage(`url(${imagePath})`)}>
-                      <AutoFixHighIcon fontSize="small" />
+                      <ChangeCircleIcon fontSize="small" />
                     </Button>
                     <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(imagePath)}>
                       <ImageSearchIcon fontSize="small" />
                     </Button>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(imagePath)}>
+                    {cartImages.includes(imagePath) ? (
+                        <RemoveShoppingCartIcon fontSize="small" /> // 이미지가 선택된 경우
+                      ) : (
+                        <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
+                      )}
+                    </Button>
+
+                  {/* // 시뮬레이션  */}
+                  <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => handleDialogOpen(imagePath)}>
+                    <AutoFixHighIcon fontSize="small" />
+                  </Button>
+                  <Dialog open={openDialog} onClose={handleDialogClose} maxWidth="false" PaperProps={{
+                    style: {
+                      height: '100%', 
+                      width: '100%', 
+                    },
+                  }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
+                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={handleDialogClose}>
+                        <CloseIcon />
+                      </Button>
+                    </Box>
+                    <Box sx={{ display: 'flex', height: '100%' }}>
+                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '100px' }}>
+                      </Card>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center',  flex: 1 }}>
+                      <Typography variant="h6" sx={{ marginBottom: '20px' }}>2850K 7500k</Typography> {/* 최소값 표시 */}
+        <Slider defaultValue={2850} aria-label="Default" valueLabelDisplay="auto" size="large" sx={{ width: '360px', color: '#000' }} max={7500} min={2850} />
+                      </Box>
+                    </Box>
+                  </Box>
+                </Dialog>
                   </Box>
                 </Card>
               </Grid>
