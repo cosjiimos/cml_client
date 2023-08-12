@@ -26,7 +26,7 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ImageSearchIcon from '@mui/icons-material/ImageSearch';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 
-axios.defaults.baseURL = "http://166.104.34.158:5005";
+axios.defaults.baseURL = "http://166.104.34.158:5002";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -74,7 +74,6 @@ export default function Album () {
   const [mainBackSliderValue, setMainBackSliderValue] = useState(null);
   const [mainFurnSliderValue, setMainFurnSliderValue] = useState(null);
 
-
   // 이미지를 가져오는 함수
   async function fetchImages(back, furn, pageNum, image) {
     try {
@@ -95,6 +94,8 @@ export default function Album () {
   }
 
 //시뮬레이션 
+//시뮬레이션 이미지와 슬라이더 바의 값을 가져오는 함슈
+
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogImage, setDialogImage] = useState(null);
   const handleDialogOpen = (imagePath) => {
@@ -122,13 +123,13 @@ export default function Album () {
 
   const handleBackSliderChange = (index, event, newValue) => {
     const newSliderValues = [...backSliderValues];
-    newSliderValues[index] = newValue;
+    newSliderValues[index] = newValue === 0 ? null : newValue; // 값이 0인 경우 null 할당
     setBackSliderValues(newSliderValues);
 
   };
   const handleFurnSliderChange = (index, event, newValue) => {
     const newSliderValues = [...furnSliderValues];
-    newSliderValues[index] = newValue;
+    newSliderValues[index] = newValue === 0 ? null : newValue;
     setFurnSliderValues(newSliderValues);
   };
 
@@ -138,53 +139,64 @@ export default function Album () {
     fetchImages(backSliderValues, furnSliderValues, pageNum, backgroundImage);
   };
 
-  //메인 슬라이더 값 조정
+  //메인 슬라이더 값 조정 / "전체"
   const handleBackMainSliderChange = (event, newValue) => {
-    setMainBackSliderValue(newValue);
-    setBackSliderValues(Array(Back_controls.length).fill(newValue)); // 모든 backSliderValues를 newValue로 설정
+    setMainBackSliderValue(newValue === 0 ? null : newValue);
+    setBackSliderValues(Array(Back_controls.length).fill(newValue === 0 ? null : newValue)); // 값이 0이면 null로 설정
   };
   const handleFurnMainSliderChange = (event, newValue) => {
-    setMainFurnSliderValue(newValue);
-    setFurnSliderValues(Array(Back_controls.length).fill(newValue)); // 모든 backSliderValues를 newValue로 설정
-  };
-  //세부 슬라이더 값 조정
-  const Back_toggleSlider = (index) => {
-    const Back_updatedControls = [...Back_controls];
-    Back_updatedControls[index].disabled = !Back_updatedControls[index].disabled;
-    console.log(Back_updatedControls[index])
-    Back_updatedControls[index].active = !Back_updatedControls[index].active;
-    if (Back_controls[index].disabled) {
-      // 비활성화되면 현재 값을 저장하고 sliderValues에서는 null로 설정
-      const newSavedValues = [...backsavedValues];
-      newSavedValues[index] = backSliderValues[index];
-      setbackSavedValues(newSavedValues);
-      backSliderValues[index] = null;
-    } else {
-      // 활성화되면 저장된 값을 사용
-      backSliderValues[index] = backsavedValues[index];
-    }
-    setBackSliderValues(backSliderValues);
-
-    Back_setControls(Back_updatedControls);
+    setMainFurnSliderValue(newValue === 0 ? null : newValue);
+    setFurnSliderValues(Array(Back_controls.length).fill(newValue === 0 ? null : newValue)); // 값이 0이면 null로 설정
   };
 
-  const Furn_toggleSlider = (index) => {
-    const Furn_updatedControls = [...Furn_controls];
-    Furn_updatedControls[index].disabled = !Furn_updatedControls[index].disabled;
-    Furn_updatedControls[index].active = !Furn_updatedControls[index].active;
-    if (Furn_controls[index].disabled) {
-      // 비활성화되면 현재 값을 저장하고 sliderValues에서는 null로 설정
-      const newSavedValues = [...furnsavedValues];
-      newSavedValues[index] = furnSliderValues[index];
-      setfurnSavedValues(newSavedValues);
-      furnSliderValues[index] = null;
-    } else {
-      // 활성화되면 저장된 값을 사용
-      furnSliderValues[index] = furnsavedValues[index];
-    }
-    setFurnSliderValues(furnSliderValues);
-    Furn_setControls(Furn_updatedControls);
-  };
+// 셈 : "전체"  슬라이더 활성화/비활성화
+const toggleAllBackSliders = (enable) => {
+  const updatedControls = Back_controls.map(control => ({ ...control, disabled: enable }));
+  Back_setControls(updatedControls);
+  if (enable) {
+    setBackSliderValues(Array(Back_controls.length).fill(null));
+  }
+};
+const toggleAllFurnSliders = (enable) => {
+  const updatedControls = Furn_controls.map(control => ({ ...control, disabled: enable })); // 'disabled' 값을 'enable'로 설정
+  Furn_setControls(updatedControls);
+  if (enable) { // 'enable'이 true인 경우에 슬라이더 값을 null로 설정
+    setFurnSliderValues(Array(Furn_controls.length).fill(null));
+  }
+};
+
+// 셈 : "개별" 슬라이더 활성화/비활성화
+const Back_toggleSlider = (index) => {
+  const Back_updatedControls = [...Back_controls];
+  Back_updatedControls[index].disabled = !Back_updatedControls[index].disabled;
+  Back_setControls(Back_updatedControls);
+};
+const Furn_toggleSlider = (index) => {
+  const Furn_updatedControls = [...Furn_controls];
+  Furn_updatedControls[index].disabled = !Furn_updatedControls[index].disabled;
+  Furn_setControls(Furn_updatedControls);
+};
+
+// 셈 : 버튼 클릭 이벤트
+const handleBackgroundButtonClick = () => {
+  if (showBackgroundButtons) {
+    toggleAllBackSliders(false);
+  } else {
+    toggleAllBackSliders(true);
+  }
+  setshowBackgroundButtons(!showBackgroundButtons);
+};
+
+const handleFurnitureButtonClick = () => {
+  if (!showFurnitureButtons) { // 'showFurnitureButtons'가 false인 경우에 슬라이더를 활성화
+    toggleAllFurnSliders(true);
+  } else {
+    toggleAllFurnSliders(false);
+  }
+  setshowFurnitureButtons(!showFurnitureButtons);
+};
+
+
 
   const handleViewSelectedImages = () => {
     setViewSelectedImages(true);
@@ -201,9 +213,12 @@ export default function Album () {
     } else {
       setcartImages(prev => [...prev, image]);
     }
-    console.log(cartImages)
   };
-  
+
+  // 셈 : cartImage 로그 
+  useEffect(() => {
+    console.log('cartImages :', cartImages);
+  }, [cartImages])
 
   const handleUpClick = () => {
     setPageNum(pageNum - 1); 
@@ -218,7 +233,7 @@ export default function Album () {
 
   const imghandleOpen = (image) => {
     setSelectedImage(image);
-    console.log(image) //이거를 가져와 셈아
+    console.log('Large image : ', image) //이거를 가져와 셈아
     setOpen(true);
   };
 
@@ -245,7 +260,7 @@ export default function Album () {
   
   }, []);
 
-  //Target Image 변경
+  // Target Image 변경 / 셈:
   const loadImage = (url) => {
     const extractedUrl = url.match(/\((.*?)\)/)[1];
     const fileName = extractedUrl.substring(extractedUrl.lastIndexOf('/') + 1).split('.')[0] + '.jpg';
@@ -253,18 +268,39 @@ export default function Album () {
     const imgpath = require(`./img/${fileName}`)
     console.log('imgPath',imgpath)
     setBackgroundImage(imgpath);
+    // pageNum을 0으로 설정
+    setPageNum(0);
 
-    const Furn_newControls = Furn_controls.map(control => ({ ...control, disabled: true, value: 0 }));
+    // 메인 슬라이더 값을 null로 초기화
+    setMainBackSliderValue(null);
+    setMainFurnSliderValue(null);
+
+    const copyBackControls = [...Back_controls]
+    // 모든 슬라이더 값을 null로 초기화
+    const newBackSliderValues = Array(copyBackControls.length).fill(null);
+    setBackSliderValues(newBackSliderValues);
+    const newFurnSliderValues = Array(copyBackControls.length).fill(null);
+    setFurnSliderValues(newFurnSliderValues);
+
+    const Back_newControls = Back_controls.map(control => ({ ...control, disabled: true, active: false, value: 0 })); //이렇게해야 버튼 초기화
+    Back_setControls(Back_newControls);
+    const Furn_newControls = Furn_controls.map(control => ({ ...control, disabled: true, active: false, value: 0 }));
     Furn_setControls(Furn_newControls);
 
-    const Back_newControls = Back_controls.map(control => ({ ...control, disabled: true, value: 0 }));
-    Back_setControls(Back_newControls);
+    // 타겟 이미지가 변경되면 showBackgroundButtons을 false로 설정
+    setshowBackgroundButtons(false);
+    setshowFurnitureButtons(false);
+
+  };
+
+  // backSliderValues와 furnSliderValues 중 하나라도 null이 아닌 값을 가지면 true를 반환하는 함수
+  const isSendEnabled = () => {
+    return backSliderValues.some(value => value !== null) || furnSliderValues.some(value => value !== null);
   };
 
 
 
-
-
+ //버튼&슬라이더 변경! 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -353,58 +389,107 @@ export default function Album () {
               </Card>
               <Box sx={{ mb: 4 }} />
             <Grid item>
-              <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' }} onClick={() => {setshowBackgroundButtons(!showBackgroundButtons); setBackSliderValues(Array(Back_controls.length).fill(null));}}>
+              <Button //(큰 버튼:Furniture)
+                variant="outlined"
+                sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' }}
+                onClick={handleBackgroundButtonClick}
+              >
                 background
               </Button>
             </Grid>
-            {!showBackgroundButtons &&<Slider defaultValue={0} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} max={50} min={-50} onChange={handleBackMainSliderChange}/>}
-            {showBackgroundButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링
+            {!showBackgroundButtons && // showButtons가 false인거 (큰 슬라이더:Background)
+              <Slider
+                value={mainBackSliderValue || 0}
+                defaultValue={0} 
+                aria-label="Default" 
+                valueLabelDisplay="auto" 
+                size="small" 
+                sx={{width: '360px', color: '#000'}} 
+                max={50} 
+                min={-50} 
+                onChange={handleBackMainSliderChange}
+                valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
+                marks={[
+                  { value: -50, label: '다양' },
+                  { value: 0, label: 'none' },
+                  { value: 50, label: '유사' },
+                ]}
+            />}
+            {showBackgroundButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링 (작은 슬라이더 :Background)
             <>
-            <Grid container><Box sx={{ mb: 2 }} />
-                  {Back_controls.map((control, index) => (
-                    <Grid item key={index}>
-                      <Button
-                        variant={control.disabled ? 'outlined' : 'filled'}
-                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#000' : '#999', color:  '#fff', borderColor :control.active ? '#000' : '#999', fontWeight: 'bold' }}
-                        onClick={() => Back_toggleSlider(index)}
-                      >
-                        {control.name}
-                      </Button>
-                      <Slider
-                        defaultValue={0}
-                        aria-label="Default"
-                        valueLabelDisplay="auto"
-                        size="small"
-                        sx={{ width: '360px', color: '#000' }}
-                        disabled={control.disabled}
-                        onChange={(event, newValue) => handleBackSliderChange(index, event, newValue)}
-                        max={50} min={-50}
-                      />
+            <Grid container>
+              <Box sx={{ mb: 2 }} />
+              {Back_controls.map((control, index) => (
+                <Grid item key={index}>
+                  <Button
+                    variant={control.disabled ? 'outlined' : 'filled'}
+                    sx={{ width: '130px', height: '25px', backgroundColor: control.disabled ? '#999' : '#000', color:  '#fff', borderColor :control.disabled ? '#999' : '#000', fontWeight: 'bold' }}
+                    onClick={() => Back_toggleSlider(index)}
+                  >
+                    {control.name}
+                  </Button>
+                  <Slider
+                    // value={mainBackSliderValue || 0}
+                    defaultValue={0}
+                    aria-label="Default"
+                    valueLabelDisplay="auto"
+                    size="small"
+                    sx={{ width: '360px', color: '#000' }} 
+                    disabled={control.disabled}
+                    onChange={(event, newValue) => handleBackSliderChange(index, event, newValue)}
+                    max={50} min={-50}
+                    valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
+                    marks={[
+                      { value: -50, label: '다양' },
+                      { value: 0, label: 'none' },
+                      { value: 50, label: '유사' },
+                    ]}
+                    />
                     </Grid>
-                  ))}
+                    ))}
             </Grid>
 
               <Box sx={{ mb:3 }} />
             </>
            )}
             <Grid item>
-            <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' }} onClick={() => { setshowFurnitureButtons(!showFurnitureButtons); setFurnSliderValues(Array(Furn_controls.length).fill(null));}}>
+              
+            <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' }} //(큰 버튼:Furniture)
+            onClick={handleFurnitureButtonClick}>
             Furniture</Button>
             </Grid>
-            {!showFurnitureButtons && <Slider defaultValue={0} aria-label="Default" valueLabelDisplay="auto" size="small" sx={{width: '360px', color: '#000'}} max={50} min={-50} onChange={handleFurnMainSliderChange}/>}
-            {showFurnitureButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링
+            {!showFurnitureButtons && //(큰 슬라이더:Furniture)
+              <Slider 
+              value={mainFurnSliderValue || 0}
+              defaultValue={0} 
+              aria-label="Default" 
+              valueLabelDisplay="auto" 
+              size="small" 
+              sx={{width: '360px', color: '#000'}} 
+              max={50} min={-50} 
+              onChange={handleFurnMainSliderChange}
+              valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
+              marks={[
+                { value: -50, label: '다양' },
+                { value: 0, label: 'none' },
+                { value: 50, label: '유사' },
+              ]}
+              />
+            }
+            {showFurnitureButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링  (작은 슬라이더:Furniture)
             <><Box sx={{ mb: 2 }} />
             <Grid container>
                   {Furn_controls.map((control, index) => (
                     <Grid item key={index}>
                       <Button
                         variant={control.disabled ? 'outlined' : 'filled'}
-                        sx={{ width: '130px', height: '25px', backgroundColor: control.active ? '#000' : '#999', color:  '#fff', borderColor :control.active ? '#000' : '#999', fontWeight: 'bold' }}
+                        sx={{ width: '130px', height: '25px', backgroundColor: control.disabled ? '#999' : '#000', color:  '#fff', borderColor :control.disabled ? '#999' : '#000', fontWeight: 'bold' }}
                         onClick={() => Furn_toggleSlider(index)}
                       >
                         {control.name}
                       </Button>
                       <Slider
+                        // value={mainFurnSliderValue || 0}
                         defaultValue={0}
                         aria-label="Default"
                         valueLabelDisplay="auto"
@@ -413,6 +498,12 @@ export default function Album () {
                         disabled={control.disabled}
                         onChange={(event, newValue) => handleFurnSliderChange(index, event, newValue)}
                         max={50} min={-50}
+                        valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
+                        marks={[
+                          { value: -50, label: '다양' },
+                          { value: 0, label: 'none' },
+                          { value: 50, label: '유사' },
+                        ]}
                       />
                     </Grid>
                   ))}
@@ -422,7 +513,9 @@ export default function Album () {
            )}
             <Box sx={{ mb: 3 }} />
             <Grid item>
-              <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',marginLeft : '260px' }} endIcon={<SendIcon />} onClick={handleSendClick}>
+              <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',marginLeft : '260px' }} endIcon={<SendIcon />} 
+              onClick={handleSendClick}
+              disabled={!isSendEnabled()}>
                 Send
               </Button>
             </Grid>
@@ -477,7 +570,11 @@ export default function Album () {
                       </Card>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center',  flex: 1 }}>
                       <Typography variant="h6" sx={{ marginBottom: '20px' }}>2850K 7500k</Typography> {/* 최소값 표시 */}
-        <Slider defaultValue={2850} aria-label="Default" valueLabelDisplay="auto" size="large" sx={{ width: '360px', color: '#000' }} max={7500} min={2850} />
+        <Slider defaultValue={2850} aria-label="Default" valueLabelDisplay="auto" size="large" sx={{ width: '360px', color: '#000' }} max={7500} min={2850}
+                          marks={[
+                          { value: 2850, label: '2850k : 노래요' },
+                          { value: 7500, label: '7500k : 퍼래요' },
+                        ]} />
                       </Box>
                     </Box>
                   </Box>
@@ -485,15 +582,7 @@ export default function Album () {
                   </Box>
                 </Card>
               </Grid>
-              //  원본 이미지 보존
-              // <Grid item xs={3} key={index}>
-              //   <Card
-              //     sx={{ width: '100%', height: '240px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-              //     onClick={() => imghandleOpen(image)}
-              //   >
-              //     <img src={image} alt={`Image ${index}`} style={{ maxWidth: '100%', maxHeight: '240px' }} />
-              //    </Card>
-              // </Grid>RemoveCircleOutlineIcon
+
               ))}
             </Grid>
 
