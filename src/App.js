@@ -528,15 +528,7 @@ const handleFurnitureButtonClick = () => {
                     onChange={(event, newValue) => handleBackSliderChange(index, event, newValue)}
                     max={50} min={-50}
                     valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
-<<<<<<< HEAD
                     marks={marks}
-=======
-                    marks={[
-                      { value: -50, label: '다양' }, 
-                      { value: 0, label: 'none' },
-                      { value: 50, label: '유사' },
-                    ]}
->>>>>>> cf9ef128ea6cf7d28bcadb67e00e490f251c8967
                     />
                     </Grid>
                     ))}
