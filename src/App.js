@@ -67,6 +67,7 @@ export default function Album () {
     { name: 'Chair', disabled: true ,value: 0 },
     { name: 'Shelf', disabled: true ,value: 0 },
   ]);
+
   //슬라이더값 send버튼 누르면 값 콘솔창에 보내기
   const [backSliderValues, setBackSliderValues] = useState(Array(Back_controls.length).fill(null));
   const [furnSliderValues, setFurnSliderValues] = useState(Array(Furn_controls.length).fill(null));
@@ -107,7 +108,31 @@ export default function Album () {
   }
 };
 
+const initialCctInfo = {
+  wall: '',
+  floor: '',
+  windowpane: '',
+  ceiling: '',
+  door: '',
+  sofa: '',
+  table: '',
+  cabinet: '',
+  chair: '',
+  shelf: ''
+};
+const [cctInfo, setCctInfo] = useState(initialCctInfo);
 
+//크게보기 이미지 가져오는 함수
+async function selectedImageToServer (selected){
+  try{
+    const response = await axios.post('/show_ccts',{
+      selected : selected
+    });
+    setCctInfo({ ...initialCctInfo, ...response.data });
+  } catch (error) {
+    console.error('Error fetching CCT values:', error);
+  }
+};
 
 //시뮬레이션 
   const [openDialog, setOpenDialog] = useState(false);
@@ -130,7 +155,7 @@ export default function Album () {
     setDialogImage(imagePath);
     setOpenDialog(true);
     if(simsliderValue !== null) {
-      SimulationDataToServer(imagePath, simsliderValue);
+    SimulationDataToServer(imagePath, simsliderValue);
     }
   };
   
@@ -267,6 +292,7 @@ const handleFurnitureButtonClick = () => {
 
   const imghandleOpen = (image) => {
     setSelectedImage(image);
+    selectedImageToServer(image); // 이미지 이름을 서버로 전송
     console.log('Large image : ', image) //이거를 가져와 셈아
     setOpen(true);
   };
@@ -330,7 +356,9 @@ const handleFurnitureButtonClick = () => {
   const isSendEnabled = () => {
     return backSliderValues.some(value => value !== null) || furnSliderValues.some(value => value !== null);
   };
-
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
 
 
  //버튼&슬라이더 변경! 
@@ -638,11 +666,18 @@ const handleFurnitureButtonClick = () => {
 
             <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="md">
               <img src={selectedImage} style={{ width: '100%', height: '100%' }} />
-              <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Background </Box>
+              {Object.keys(cctInfo).map(key => (
+                <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>
+                  {capitalizeFirstLetter(key)} : {cctInfo[key] || 'N/A'} 
+                </Box>
+              ))
+
+              }
+              {/* <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Background </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Floor : 2500k ~3800k </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Windowpane :  </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Ceiling :  </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Door  :  </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Door  :  </Box> */}
             </Dialog>
           </Grid>
       </Grid>
