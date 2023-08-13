@@ -28,7 +28,7 @@ import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-axios.defaults.baseURL = "http://166.104.34.158:5006";
+axios.defaults.baseURL = "http://166.104.34.158:5002";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -324,13 +324,33 @@ const handleFurnitureButtonClick = () => {
   const loadDefaultImage = async () => {
     const image = await import('./img/cards_5294632.jpg');
     setBackgroundImage(image.default);
+    setPageNum(0);
+
+    // 메인 슬라이더 값을 null로 초기화
+    setMainBackSliderValue(null);
+    setMainFurnSliderValue(null);
+
+    const copyBackControls = [...Back_controls]
+    // 모든 슬라이더 값을 null로 초기화
+    const newBackSliderValues = Array(copyBackControls.length).fill(null);
+    setBackSliderValues(newBackSliderValues);
+    const newFurnSliderValues = Array(copyBackControls.length).fill(null);
+    setFurnSliderValues(newFurnSliderValues);
+
+    const Back_newControls = Back_controls.map(control => ({ ...control, disabled: true, active: false, value: 0 })); //이렇게해야 버튼 초기화
+    Back_setControls(Back_newControls);
+    const Furn_newControls = Furn_controls.map(control => ({ ...control, disabled: true, active: false, value: 0 }));
+    Furn_setControls(Furn_newControls);
+
+    setshowBackgroundButtons(false);
+    setshowFurnitureButtons(false);
   };
   
   useEffect(() => {
     loadDefaultImage();
   }, []);
 
-  // Target Image 변경 / 셈:
+  // Target Image 변경
   const loadImage = (url) => {
     const extractedUrl = url.match(/\((.*?)\)/)[1];
     const fileName = extractedUrl.substring(extractedUrl.lastIndexOf('/') + 1).split('.')[0] + '.jpg';
@@ -370,6 +390,7 @@ const handleFurnitureButtonClick = () => {
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
+  
 
 
  //버튼&슬라이더 변경! 
@@ -704,18 +725,13 @@ const handleFurnitureButtonClick = () => {
 
             <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="md">
               <img src={selectedImage} style={{ width: '100%', height: '100%' }} />
-              {Object.keys(cctInfo).map(key => (
-                <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>
-                  {capitalizeFirstLetter(key)} : {cctInfo[key] || 'N/A'} 
-                </Box>
-              ))
-
-              }
-              {/* <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Background </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Floor : 2500k ~3800k </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Windowpane :  </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Ceiling :  </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', padding: 0 }}>Door  :  </Box> */}
+              {Object.keys(cctInfo).map((key, index) => (
+                cctInfo[key]
+                  ? <Box key={index} sx={{ display: 'flex', alignItems: 'center', padding: 1 }}>
+                      {capitalizeFirstLetter(key)} : {cctInfo[key]}
+                    </Box>
+                  : null
+              ))}
             </Dialog>
           </Grid>
       </Grid>
