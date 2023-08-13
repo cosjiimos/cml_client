@@ -101,7 +101,7 @@ export default function Album () {
         cctValues: cctValues,
       });
       console.log(response.data)
-
+      setSimulatedImage(response.data.image); // 받은 이미지를 상태로 설정
   } catch (error) {
     console.error('Error fetching images:', error);
   }
@@ -113,9 +113,13 @@ export default function Album () {
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogImage, setDialogImage] = useState(null);
   const [simsliderValue, setSimsliderValue] = useState(null);
+  const [simulatedImage, setSimulatedImage] = useState(null);
 
   useEffect(() => {
-    SimulationDataToServer(dialogImage, simsliderValue); // simsliderValue 값이 변경될 때마다 서버로 전송
+    if(simsliderValue !== null) {
+      SimulationDataToServer(dialogImage, simsliderValue)
+    }
+    ; // simsliderValue 값이 변경될 때마다 서버로 전송
   }, [simsliderValue, dialogImage]);
 
   const handleSimulationChange = (event, newValue) => {
@@ -125,7 +129,9 @@ export default function Album () {
   const handleDialogOpen = (imagePath) => {
     setDialogImage(imagePath);
     setOpenDialog(true);
-    SimulationDataToServer(imagePath, simsliderValue);
+    if(simsliderValue !== null) {
+      SimulationDataToServer(imagePath, simsliderValue);
+    }
   };
   
   const handleDialogClose = () => {
@@ -141,7 +147,10 @@ export default function Album () {
 
   // pageNum이 변경될 때마다 fetchImages를 호출
   useEffect(() => {
-    fetchImages(backSliderValues, furnSliderValues, pageNum, backgroundImage);
+    if (backgroundImage !== null){
+      fetchImages(backSliderValues, furnSliderValues, pageNum, backgroundImage);
+    }
+    
   }, [pageNum]);
 
 
@@ -160,6 +169,7 @@ export default function Album () {
   const handleSendClick = () => {
     console.log('Back Controls:', backSliderValues);
     console.log('Furn Controls:', furnSliderValues);
+    console.log('backgroundImage:', backgroundImage);
     fetchImages(backSliderValues, furnSliderValues, pageNum, backgroundImage);
   };
 
@@ -469,7 +479,7 @@ const handleFurnitureButtonClick = () => {
                     max={50} min={-50}
                     valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
                     marks={[
-                      { value: -50, label: '다양' },
+                      { value: -50, label: '다양' }, 
                       { value: 0, label: 'none' },
                       { value: 50, label: '유사' },
                     ]}
@@ -612,6 +622,9 @@ const handleFurnitureButtonClick = () => {
                       { value: 2850, label: '2850k : 노래요' },
                       { value: 7500, label: '7500k : 퍼래요' },
                     ]} />
+                    <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${simulatedImage})`, backgroundSize: 'cover', 
+                    backgroundPosition: 'center', marginLeft: '100px' }}>
+                    </Card>
                       </Box>
                     </Box>
                   </Box>
