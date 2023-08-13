@@ -26,8 +26,9 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ImageSearchIcon from '@mui/icons-material/ImageSearch';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-axios.defaults.baseURL = "http://166.104.34.158:5002";
+axios.defaults.baseURL = "http://166.104.34.158:5006";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -303,7 +304,17 @@ const handleFurnitureButtonClick = () => {
   };
 
 
-
+  const CustomizedMark = ({ value, label, align }) => (
+    <div style={{ width: '100%', textAlign: align, position: 'relative' }}>
+      <span style={{ fontSize: '12px', position: 'absolute', left: align === 'center' ? '-12px' : '5', [align]: 0 }}>{label}</span>
+    </div>
+  );
+  
+  const marks = [
+    { value: -50, label: <CustomizedMark label="dissmiliar" align="left" /> },
+    { value: 0, label: <CustomizedMark label="none" align="center" /> },
+    { value: 50, label: <CustomizedMark label="similiar" align="right" /> },
+  ];
 
 
 
@@ -366,9 +377,9 @@ const handleFurnitureButtonClick = () => {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <main>
-        <Container sx={{ py: 4}} maxWidth="false" >
+        <Container sx={{ py: 2}} maxWidth="false" >
           <Grid container spacing={0} justifyContent="flex-end">
-            <Grid item xs={1.5}>
+            <Grid item xs={1.8}>
               <Button
                 variant="outlined"
                 endIcon={<AddShoppingCartIcon/>}
@@ -399,26 +410,69 @@ const handleFurnitureButtonClick = () => {
                           backgroundPosition: 'center',
                           margin: ' 20px'
                         }}
-                      ><Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
-                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(image)}>
-                        <ImageSearchIcon fontSize="small" />
+                      >
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(image)}>
+                      <ImageSearchIcon fontSize="small" />
+                    </Button>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(image)}>
+                    {cartImages.includes(image) ? (
+                        <RemoveShoppingCartIcon fontSize="small" /> // 이미지가 선택된 경우
+                      ) : (
+                        <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
+                      )}
+                    </Button>
+
+                  {/* // 시뮬레이션  */}
+                  <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => handleDialogOpen(image)}>
+                    <AutoFixHighIcon fontSize="small" />
+                  </Button>
+                  <Dialog open={openDialog} onClose={handleDialogClose} maxWidth="false" PaperProps={{
+                    style: {
+                      height: '100%', 
+                      width: '100%', 
+                    },
+                  }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
+                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={handleDialogClose}>
+                        <CloseIcon />
                       </Button>
-                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(image)}>
-                        {cartImages.includes(image) ? (
-                          <RemoveShoppingCartIcon fontSize="small" /> // 이미지가 선택된 경우
-                        ) : (
-                          <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
-                        )}
-                      </Button>
-                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }}>
-                        <AutoFixHighIcon fontSize="small" />
-                      </Button>
-                      
-                    </Box></Card>
+                    </Box>
+                    <Box sx={{ display: 'flex', height: '100%' }}>
+                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '100px' }}>
+                      </Card>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center',  flex: 1 }}>
+                      <Typography variant="h6" sx={{ marginBottom: '20px' }}>2850K 7500k</Typography> {/* 최소값 표시 */}
+                      <Slider 
+                      value={simsliderValue}
+                      onChange={handleSimulationChange} 
+                      defaultValue={2850}
+                      aria-label="Default" 
+                      valueLabelDisplay="auto" 
+                      size="large" 
+                      sx={{ width: '360px', color: '#000' }} 
+                      max={7500} min={2850}
+                      marks={[
+                      { value: 2850, label: '2850k : 노래요' },
+                      { value: 7500, label: '7500k : 퍼래요' },
+                    ]} />
+                      </Box>
+                    </Box>
+                  </Box>
+                </Dialog>
+                  </Box>
+                    </Card>
                     </Grid>
                   ))}
                 </Grid>
               </Dialog>
+              <Button
+                variant="outlined"
+                endIcon={<DeleteIcon  />}
+                sx={{ fontWeight: 'bold', width: '90px', height: '40px', color: 'gray', borderColor: 'gray', marginLeft: '20px' }} onClick={loadDefaultImage}>
+                Reset
+              </Button>
               <IconButton onClick={handleUpClick} disabled={pageNum === 0}>
                 <KeyboardArrowUpRoundedIcon sx={{ fontSize: 40}} />
               </IconButton>
@@ -433,18 +487,18 @@ const handleFurnitureButtonClick = () => {
           </Grid>           
         </Container>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '100px' }}>
+        {/* <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '400px' }}>
             <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={loadDefaultImage}>
               <RestartAltIcon></RestartAltIcon>
-        </Button></Box>
+        </Button></Box> */}
 
         <Container sx={{ py: 1 }} maxWidth={false}>
           <Grid Grid container spacing={2}>
-          <Grid item xs={0.4}></Grid>
-            <Grid item xs={1.6}>
+          <Grid item xs={0.3}></Grid>
+            <Grid item xs={1.7}>
               
               <Card
-                sx={{ width: '360px', height: '240px', display: 'flex', flexDirection: 'column', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                sx={{ width: '400px', height: '240px', display: 'flex', flexDirection: 'column', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                   <Button variant="filled" sx={{ color: '#fff', fontWeight: 'bold' ,width : '10px'}} onClick={() => imghandleOpen(backgroundImage)}>
                     <ImageSearchIcon fontSize="small" />
@@ -454,11 +508,11 @@ const handleFurnitureButtonClick = () => {
                     <img src={backgroundImage} style={{ width: '100%', height: '100%' }} />
                 </Dialog>
               </Card>
-              <Box sx={{ mb: 4 }} />
+              <Box sx={{ mb: 2 }} />
             <Grid item>
               <Button //(큰 버튼:Furniture)
                 variant="outlined"
-                sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' }}
+                sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',  width: '130px', height: '25px' }}
                 onClick={handleBackgroundButtonClick}
               >
                 background
@@ -471,16 +525,12 @@ const handleFurnitureButtonClick = () => {
                 aria-label="Default" 
                 valueLabelDisplay="auto" 
                 size="small" 
-                sx={{width: '360px', color: '#000'}} 
+                sx={{width: '400px', color: '#000'}} 
                 max={50} 
                 min={-50} 
                 onChange={handleBackMainSliderChange}
                 valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
-                marks={[
-                  { value: -50, label: '다양' },
-                  { value: 0, label: 'none' },
-                  { value: 50, label: '유사' },
-                ]}
+                marks={marks}
             />}
             {showBackgroundButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링 (작은 슬라이더 :Background)
             <>
@@ -501,27 +551,23 @@ const handleFurnitureButtonClick = () => {
                     aria-label="Default"
                     valueLabelDisplay="auto"
                     size="small"
-                    sx={{ width: '360px', color: '#000' }} 
+                    sx={{ width: '400px', color: '#000' }} 
                     disabled={control.disabled}
                     onChange={(event, newValue) => handleBackSliderChange(index, event, newValue)}
                     max={50} min={-50}
                     valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
-                    marks={[
-                      { value: -50, label: '다양' }, 
-                      { value: 0, label: 'none' },
-                      { value: 50, label: '유사' },
-                    ]}
+                    marks={marks}
                     />
                     </Grid>
                     ))}
             </Grid>
 
-              <Box sx={{ mb:3 }} />
+              <Box sx={{ mb:2 }} />
             </>
            )}
             <Grid item>
               
-            <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' }} //(큰 버튼:Furniture)
+            <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' ,  width: '130px', height: '25px'}} //(큰 버튼:Furniture)
             onClick={handleFurnitureButtonClick}>
             Furniture</Button>
             </Grid>
@@ -532,15 +578,11 @@ const handleFurnitureButtonClick = () => {
               aria-label="Default" 
               valueLabelDisplay="auto" 
               size="small" 
-              sx={{width: '360px', color: '#000'}} 
+              sx={{width: '400px', color: '#000'}} 
               max={50} min={-50} 
               onChange={handleFurnMainSliderChange}
               valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
-              marks={[
-                { value: -50, label: '다양' },
-                { value: 0, label: 'none' },
-                { value: 50, label: '유사' },
-              ]}
+              marks={marks}
               />
             }
             {showFurnitureButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링  (작은 슬라이더:Furniture)
@@ -561,26 +603,22 @@ const handleFurnitureButtonClick = () => {
                         aria-label="Default"
                         valueLabelDisplay="auto"
                         size="small"
-                        sx={{ width: '360px', color: '#000' }}
+                        sx={{ width: '400px', color: '#000' }}
                         disabled={control.disabled}
                         onChange={(event, newValue) => handleFurnSliderChange(index, event, newValue)}
                         max={50} min={-50}
                         valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
-                        marks={[
-                          { value: -50, label: '다양' },
-                          { value: 0, label: 'none' },
-                          { value: 50, label: '유사' },
-                        ]}
+                        marks={marks}
                       />
                     </Grid>
                   ))}
             </Grid>
-              <Box sx={{ mb: 2 }} />
+              <Box sx={{ mb: 1 }} />
             </>
            )}
-            <Box sx={{ mb: 3 }} />
+            <Box sx={{ mb: 1 }} />
             <Grid item>
-              <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',marginLeft : '260px' }} endIcon={<SendIcon />} 
+              <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',marginLeft : '310px' }} endIcon={<SendIcon />} 
               onClick={handleSendClick}
               disabled={!isSendEnabled()}>
                 Send
@@ -591,14 +629,14 @@ const handleFurnitureButtonClick = () => {
 
 
           </Grid>
-          <Grid item xs={0.5}></Grid>
-          <Grid item xs={9.5}>
-            <Grid container spacing={3}>
+          <Grid item xs={0.7}></Grid>
+          <Grid item xs={9.3}>
+            <Grid container spacing={5}>
               {currentImagePaths.map((imagePath, index) => (
               // 카드 크기에 맞춰서 줌인
               <Grid item xs={3} key={index}>
                 <Card
-                  sx={{ width: '80%', height: '240px', backgroundImage: `url(${imagePath})`, backgroundSize: 'cover', backgroundPosition: 'center', border: cartImages.includes(imagePath) ? '5px solid #CF4ECB' : 'none' }}               
+                  sx={{ width: '90%', height: '250px', backgroundImage: `url(${imagePath})`, backgroundSize: 'cover', backgroundPosition: 'center', border: cartImages.includes(imagePath) ? '5px solid #CF4ECB' : 'none' }}               
                 >
                   <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
                     
