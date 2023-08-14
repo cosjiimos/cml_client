@@ -28,7 +28,7 @@ import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-axios.defaults.baseURL = "http://166.104.34.158:5002";
+axios.defaults.baseURL = "http://166.104.34.158:5008";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -695,8 +695,13 @@ const handleFurnitureButtonClick = () => {
                       <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '100px' }}>
                       </Card>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center',  flex: 1 }}>
-                      <Typography variant="h6" sx={{ marginBottom: '20px' }}>2850K 7500k</Typography> {/* 최소값 표시 */}
-                      <Slider 
+                      {/* <Typography variant="h6" sx={{ marginBottom: '20px' }}>2850K 7500k</Typography> 
+                      최소값 표시 */}
+                      
+                    <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${simulatedImage})`, backgroundSize: 'cover', 
+                    backgroundPosition: 'center', marginLeft: '100px' }}>
+                    </Card>
+                    <Slider 
                       value={simsliderValue}
                       onChange={handleSimulationChange} 
                       defaultValue={2850}
@@ -709,9 +714,6 @@ const handleFurnitureButtonClick = () => {
                       { value: 2850, label: '2850k : 노래요' },
                       { value: 7500, label: '7500k : 퍼래요' },
                     ]} />
-                    <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${simulatedImage})`, backgroundSize: 'cover', 
-                    backgroundPosition: 'center', marginLeft: '100px' }}>
-                    </Card>
                       </Box>
                     </Box>
                   </Box>
