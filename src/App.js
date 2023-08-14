@@ -28,7 +28,7 @@ import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-axios.defaults.baseURL = "http://166.104.34.158:5006";
+axios.defaults.baseURL = "http://166.104.34.158:5002";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -69,6 +69,33 @@ export default function Album () {
     { name: 'Shelf', disabled: true ,value: 0 },
   ]);
 
+  const initialobjectInfo = {
+    wall: false,
+    floor: false,
+    windowpane: false,
+    ceiling: false,
+    door: false,
+    sofa: false,
+    table: false,
+    cabinet: false,
+    chair: false,
+    shelf: false
+  };
+  const [objectInfo, setObjectInfo] = useState(initialobjectInfo);
+  
+  //타겟이미지에서 오브젝트 체크하는 함수! 
+  async function selectedImageToServer (selected){
+    try{
+      const response = await axios.post('/check_object',{
+        selected : selected
+      });
+      setObjectInfo({ ...initialobjectInfo, ...response.data });
+    } catch (error) {
+      console.error('Error fetching object values:', error);
+    }
+  };
+
+  
   //슬라이더값 send버튼 누르면 값 콘솔창에 보내기
   const [backSliderValues, setBackSliderValues] = useState(Array(Back_controls.length).fill(null));
   const [furnSliderValues, setFurnSliderValues] = useState(Array(Furn_controls.length).fill(null));
@@ -77,7 +104,7 @@ export default function Album () {
   const [mainBackSliderValue, setMainBackSliderValue] = useState(null);
   const [mainFurnSliderValue, setMainFurnSliderValue] = useState(null);
 
-  // 이미지를 가져오는 함수
+  // 결과 이미지를 가져오는 함수
   async function fetchImages(back, furn, pageNum, image) {
     try {
       const response = await axios.post('/get_images', { 
@@ -109,32 +136,6 @@ export default function Album () {
   }
 };
 
-const initialCctInfo = {
-  wall: '',
-  floor: '',
-  windowpane: '',
-  ceiling: '',
-  door: '',
-  sofa: '',
-  table: '',
-  cabinet: '',
-  chair: '',
-  shelf: ''
-};
-const [cctInfo, setCctInfo] = useState(initialCctInfo);
-
-//크게보기 이미지 가져오는 함수
-async function selectedImageToServer (selected){
-  try{
-    const response = await axios.post('/show_ccts',{
-      selected : selected
-    });
-    setCctInfo({ ...initialCctInfo, ...response.data });
-  } catch (error) {
-    console.error('Error fetching CCT values:', error);
-  }
-};
-
 //시뮬레이션 
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogImage, setDialogImage] = useState(null);
@@ -155,6 +156,8 @@ async function selectedImageToServer (selected){
   const handleDialogOpen = (imagePath) => {
     setDialogImage(imagePath);
     setOpenDialog(true);
+    // selectedImageToServer(imagePath); //cct 받던거 
+    console.log("imagePath", imagePath)
     if(simsliderValue !== null) {
     SimulationDataToServer(imagePath, simsliderValue);
     }
@@ -176,7 +179,6 @@ async function selectedImageToServer (selected){
     if (backgroundImage !== null){
       fetchImages(backSliderValues, furnSliderValues, pageNum, backgroundImage);
     }
-    
   }, [pageNum]);
 
 
@@ -184,8 +186,8 @@ async function selectedImageToServer (selected){
     const newSliderValues = [...backSliderValues];
     newSliderValues[index] = newValue === 0 ? null : newValue; // 값이 0인 경우 null 할당
     setBackSliderValues(newSliderValues);
-
   };
+
   const handleFurnSliderChange = (index, event, newValue) => {
     const newSliderValues = [...furnSliderValues];
     newSliderValues[index] = newValue === 0 ? null : newValue;
@@ -227,17 +229,34 @@ const toggleAllFurnSliders = (enable) => {
 
 // 셈 : "개별" 슬라이더 활성화/비활성화
 const Back_toggleSlider = (index) => {
-  const Back_updatedControls = [...Back_controls];
-  Back_updatedControls[index].disabled = !Back_updatedControls[index].disabled;
-  Back_setControls(Back_updatedControls);
+  const BackcontrolName = Back_controls[index].name.toLowerCase();
+  if (objectInfo[BackcontrolName]) { // 오브젝트가 있는 경우에만 활성화
+    const Back_updatedControls = [...Back_controls];
+    Back_updatedControls[index].disabled = !Back_updatedControls[index].disabled;
+    Back_setControls(Back_updatedControls);
+    if (Back_updatedControls[index].disabled) { // If the control is now disabled
+      const newBackSliderValues = [...backSliderValues];
+      newBackSliderValues[index] = null; // Set the corresponding value to null
+      setBackSliderValues(newBackSliderValues);
+  }
+  }
 };
 const Furn_toggleSlider = (index) => {
-  const Furn_updatedControls = [...Furn_controls];
-  Furn_updatedControls[index].disabled = !Furn_updatedControls[index].disabled;
-  Furn_setControls(Furn_updatedControls);
+  const FurncontrolName = Furn_controls[index].name.toLowerCase();
+  if (objectInfo[FurncontrolName]) { // 오브젝트가 있는 경우에만 활성화
+    const Furn_updatedControls = [...Furn_controls];
+    Furn_updatedControls[index].disabled = !Furn_updatedControls[index].disabled;
+    Furn_setControls(Furn_updatedControls);
+    
+    if (Furn_updatedControls[index].disabled) { // If the control is now disabled
+      const newFurnSliderValues = [...furnSliderValues];
+      newFurnSliderValues[index] = null; // Set the corresponding value to null
+      setFurnSliderValues(newFurnSliderValues);
+     }
+  }
 };
 
-// 셈 : 버튼 클릭 이벤트
+// 셈 : 전체 버튼 클릭 이벤트
 const handleBackgroundButtonClick = () => {
   if (showBackgroundButtons) {
     toggleAllBackSliders(false);
@@ -246,7 +265,6 @@ const handleBackgroundButtonClick = () => {
   }
   setshowBackgroundButtons(!showBackgroundButtons);
 };
-
 const handleFurnitureButtonClick = () => {
   if (!showFurnitureButtons) { // 'showFurnitureButtons'가 false인 경우에 슬라이더를 활성화
     toggleAllFurnSliders(true);
@@ -293,7 +311,7 @@ const handleFurnitureButtonClick = () => {
 
   const imghandleOpen = (image) => {
     setSelectedImage(image);
-    selectedImageToServer(image); // 이미지 이름을 서버로 전송
+    // selectedImageToServer(image); // 이미지 이름을 서버로 전송 후  cct 받던거
     console.log('Large image : ', image) //이거를 가져와 셈아
     setOpen(true);
   };
@@ -322,8 +340,10 @@ const handleFurnitureButtonClick = () => {
   // 세민 궁금해요 : cards_21561263, cards_20394197 cards_12137732
   // 유경 궁금해요 : cards_8486233 cards_17760123 cards_4143928 cards_10687665
   const loadDefaultImage = async () => {
-    const image = await import('./img/cards_5294632.jpg');
+    const image = await import('./img/cards_4930502.jpg');
     setBackgroundImage(image.default);
+    console.log("image", image.default)
+    selectedImageToServer(image.default)
     setPageNum(0);
 
     // 메인 슬라이더 값을 null로 초기화
@@ -358,6 +378,7 @@ const handleFurnitureButtonClick = () => {
     const imgpath = require(`./img/${fileName}`)
     console.log('imgPath',imgpath)
     setBackgroundImage(imgpath);
+    selectedImageToServer(imgpath); //오브젝트 정보 받아오기 --> 토글 비활성화
     // pageNum을 0으로 설정
     setPageNum(0);
 
@@ -462,6 +483,13 @@ const handleFurnitureButtonClick = () => {
                     </Box>
                     <Box sx={{ display: 'flex', height: '100%' }}>
                       <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '100px' }}>
+                      {/* {Object.keys(cctInfo).map((key, index) => (
+                        cctInfo[key]
+                          ? <Box key={index} sx={{ display: 'flex', alignItems: 'center', padding: 1 }}>
+                              {capitalizeFirstLetter(key)} : {cctInfo[key]}
+                            </Box>
+                          : null
+                      ))} */}
                       </Card>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center',  flex: 1 }}>
                       <Typography variant="h6" sx={{ marginBottom: '20px' }}>2850K 7500k</Typography> {/* 최소값 표시 */}
@@ -567,7 +595,7 @@ const handleFurnitureButtonClick = () => {
                     {control.name}
                   </Button>
                   <Slider
-                    // value={mainBackSliderValue || 0}
+                    value={backSliderValues[index] !== null ? backSliderValues[index] : 0}
                     defaultValue={0}
                     aria-label="Default"
                     valueLabelDisplay="auto"
@@ -619,7 +647,7 @@ const handleFurnitureButtonClick = () => {
                         {control.name}
                       </Button>
                       <Slider
-                        // value={mainFurnSliderValue || 0}
+                        value={furnSliderValues[index] !== null ? furnSliderValues[index] : 0}
                         defaultValue={0}
                         aria-label="Default"
                         valueLabelDisplay="auto"
@@ -684,7 +712,7 @@ const handleFurnitureButtonClick = () => {
                       height: '100%', 
                       width: '100%', 
                     },
-                  }}>
+                    }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
                       <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={handleDialogClose}>
@@ -725,13 +753,13 @@ const handleFurnitureButtonClick = () => {
 
             <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="md">
               <img src={selectedImage} style={{ width: '100%', height: '100%' }} />
-              {Object.keys(cctInfo).map((key, index) => (
+              {/* {Object.keys(cctInfo).map((key, index) => (
                 cctInfo[key]
                   ? <Box key={index} sx={{ display: 'flex', alignItems: 'center', padding: 1 }}>
                       {capitalizeFirstLetter(key)} : {cctInfo[key]}
                     </Box>
                   : null
-              ))}
+              ))} */}
             </Dialog>
           </Grid>
       </Grid>
