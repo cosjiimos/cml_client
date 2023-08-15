@@ -53,6 +53,8 @@ export default function Album () {
   // 장바구니 이미지
   const [cartImages, setcartImages] = useState([]);
   const [viewSelectedImages, setViewSelectedImages] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(null);
+
   //세부 파라미터 버튼
   const [Back_controls, Back_setControls] = useState([
     { name: 'Wall', disabled: true ,value: 0 },
@@ -142,13 +144,14 @@ async function selectedImageToServer (selected){
   const [simulatedImage, setSimulatedImage] = useState(null);
   const [simulatedImages, setSimulatedImages] = useState([]);
 
-  // 카드 이미지 시뮬레이션 이미지로 바꾸기
-  const SimulhandleSendClick = (index, simulatedImage) => {
-    const updatedSimulatedImages = [...simulatedImages];
-    updatedSimulatedImages[index] = simulatedImage;
-    setSimulatedImages(updatedSimulatedImages);
-    
-  };
+  const SimulhandleSendClick = (simulatedImage) => {
+    setSimulatedImages(prevImages => {
+        const newImages = [...prevImages];
+        newImages[currentImageIndex] = simulatedImage;
+        console.log(`New images:`, newImages);
+        return newImages;
+    });
+};
   //카드 이미지 원래 이미지로 바꾸기
   const SimulhandleResetClick = (index) => {
     const updatedSimulatedImages = [...simulatedImages];
@@ -261,7 +264,7 @@ const Back_toggleSlider = (index) => {
   Back_updatedControls[index].disabled = !Back_updatedControls[index].disabled;
   Back_setControls(Back_updatedControls);
 
-
+  
 };
 const Furn_toggleSlider = (index) => {
   const Furn_updatedControls = [...Furn_controls];
@@ -476,22 +479,37 @@ const handleFurnitureButtonClick = () => {
                           margin: ' 20px'
                         }}
                       >
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
-                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(image)}>
-                      <ImageSearchIcon fontSize="small" />
-                    </Button>
-                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(image)}>
-                    {cartImages.includes(image) ? (
-                        <RemoveShoppingCartIcon fontSize="small" /> // 이미지가 선택된 경우
-                      ) : (
-                        <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
-                      )}
-                    </Button>
+                  
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 0 }}>
+                    {/* 왼쪽 위에 위치할 Reset 버튼 */}
+                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => SimulhandleResetClick(index)}>
+                        <RestartAltIcon fontSize="small" />
+                      </Button>
 
-                  {/* // 시뮬레이션  */}
-                  <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => CarthandleDialogOpen(image)}>
-                    <AutoFixHighIcon fontSize="small" />
-                  </Button>
+                      {/* 오른쪽 위에 위치할 나머지 버튼들 */}
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(image)}>
+                              <ImageSearchIcon fontSize="small" />
+                          </Button>
+                          <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(image)}>
+                              {cartImages.includes(image) ? (
+                                  <RemoveShoppingCartIcon fontSize="small" /> // 이미지가 선택된 경우
+                              ) : (
+                                  <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
+                              )}
+                          </Button>
+                            {/* // 시뮬레이션  */}
+                            <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => { 
+                                CarthandleDialogOpen(image); 
+                                setCurrentImageIndex(index);
+                            }}>
+                                <AutoFixHighIcon fontSize="small" />
+                            </Button>
+                      </Box>
+
+                    
+
+                  
 
 
                   <Dialog open={openCartDialog} onClose={CarthandleDialogClose} maxWidth="false" PaperProps={{
@@ -500,7 +518,7 @@ const handleFurnitureButtonClick = () => {
                       width: '80%', 
                     },
                   }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
                       <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={CarthandleDialogClose}>
                         <CloseIcon />
@@ -551,19 +569,17 @@ const handleFurnitureButtonClick = () => {
                           sx={{ width: '360px', color: '#000' }} 
                           max={7500} min={2850}
                           marks={[
-                          { value: 2850, label: '2850k' },
-                          { value: 7500, label: '7500k' },
+                          { value: 2850, label: '2850K' },
+                          { value: 7500, label: '7500K' },
                         ]} />
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
                           <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => SimulhandleSendClick(index, simulatedImage)}>
                             Send
                           </Button>
-                          <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', marginLeft: '10px' }} onClick={() => SimulhandleResetClick(index)}>
-                            Reset
-                          </Button>
+                          
                         </Box>
                       </Box>
-                    </Box>
+                    
                   </Box>
                 </Dialog>
 
