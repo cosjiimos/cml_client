@@ -28,7 +28,7 @@ import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-axios.defaults.baseURL = "http://166.104.34.158:5008";
+axios.defaults.baseURL = "http://166.104.34.158:5002";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -181,8 +181,8 @@ export default function Album () {
   const handleDialogOpen = (imagePath) => {
     setDialogImage(imagePath);
     setOpenDialog(true);
-    // selectedImageToServer(imagePath); //cct 받던거 
-    console.log("imagePath", imagePath)
+    lightsourceCCT(imagePath); //셈 slightsource
+    // console.log("lightsourceCCT_imagePath", imagePath);
     if(simsliderValue !== null) {
     SimulationDataToServer(imagePath, simsliderValue);
     }
@@ -195,6 +195,8 @@ export default function Album () {
   const CarthandleDialogOpen = (imagePath) => {
     setDialogImage(imagePath);
     setOpenCartDialog(true);
+    lightsourceCCT(imagePath); //셈 slightsource
+    // console.log("lightsourceCCT2_imagePath", imagePath);
     if(simsliderValue !== null) {
     SimulationDataToServer(imagePath, simsliderValue);
     }
@@ -332,7 +334,33 @@ const handleFurnitureButtonClick = () => {
   //   }
   // };
 
-  
+    //"작성중" 장바구니 이미지와 simulated cart이미지를 받아오는 함수 
+  //   async function CartDataToServer (originalCart, simulatedCart){
+  //     try {
+  //       const response = await axios.post('/cartData',{
+  //         originalCart: originalCart,
+  //         simulatedCart: simulatedCart,
+  //       });
+  //       console.log(response.data)
+  //   } catch (error) {
+  //     console.error('Error CartDataToServer :', error);
+  //   }
+  // };
+
+  //장바구니 이미지를 서버로 보내서 cct값을 받아오는 함수
+  const [serverResponse, setServerResponse] = useState(null); 
+  async function lightsourceCCT (cctimage){
+    try {
+      const response = await axios.post('/lightsourceCCT',{
+        cctimage: cctimage
+      });
+      console.log("Light cct" , response.data)
+      setServerResponse(response.data);
+  } catch (error) {
+    console.error('Error lightsourceCCT :', error);
+  }
+};
+
   const toggleSelectImage = (originalImage, simulatedImage) => {
     const imagePair = { original: originalImage, simulated: simulatedImage };
   
@@ -371,8 +399,6 @@ const handleFurnitureButtonClick = () => {
 
   const imghandleOpen = (image) => {
     setSelectedImage(image);
-    // selectedImageToServer(image); // 이미지 이름을 서버로 전송 후  cct 받던거
-    // console.log('Large image : ', image) //이거를 가져와 셈아
     setOpen(true);
   };
 
@@ -578,7 +604,18 @@ const handleFurnitureButtonClick = () => {
                       <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '50px'}}>
                         <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000',fontFamily: '"futura", sans-serif',fontWeight: 'bold'}}>Original Image</Typography>
                       </Card>
-                      <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>세민짱!</Typography> 
+                      <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>
+                      {serverResponse && serverResponse["Mean Predict"] !== null && (
+                            <>
+                                <br />
+                                광원의 평균 색온도: {serverResponse["Mean Predict"]}
+                                <br />
+                                <Typography variant="body2" sx={{ fontWeight: 'lighter' }}>
+                                    색온도: {serverResponse["Predict"].join(', ')}
+                                </Typography>
+                            </>
+                        )}
+                      </Typography>
                       </Box>
                       <Box
                         sx={{
@@ -845,7 +882,18 @@ const handleFurnitureButtonClick = () => {
                       <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '50px'}}>
                         <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000' }}>Original Image</Typography>
                       </Card>
-                      <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>세민짱!</Typography> 
+                      <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>
+                      {serverResponse && serverResponse["Mean Predict"] !== null && (
+                            <>
+                                <br />
+                                광원의 평균 색온도: {serverResponse["Mean Predict"]}
+                                <br />
+                                <Typography variant="body2" sx={{ fontWeight: 'lighter' }}>
+                                    색온도: {serverResponse["Predict"].join(', ')}
+                                </Typography>
+                            </>
+                        )}
+                    </Typography>
                       </Box>
                       <Box
                         sx={{
