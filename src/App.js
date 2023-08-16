@@ -28,7 +28,7 @@ import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-axios.defaults.baseURL = "http://166.104.34.158:5002";
+axios.defaults.baseURL = "http://166.104.34.158:5008";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -435,7 +435,7 @@ const handleFurnitureButtonClick = () => {
 //   }
 // `;
 
-  // 잘 나와요 : cards_5294632()  cards_23386963(노랑거) cards_19557257(블랙소파) cards_17354717(브라운소파)
+  // 잘 나와요 : cards_5294632()  cards_23386963(노랑거) cards_19557257(블랙소파) cards_20309937
   // 세민 궁금해요 : cards_21561263, cards_20394197 cards_12137732
   // 유경 궁금해요 : cards_8486233 cards_17760123 cards_4143928 cards_10687665
   const loadDefaultImage = async () => {
