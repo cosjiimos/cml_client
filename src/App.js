@@ -188,8 +188,10 @@ export default function Album () {
     }
   };
   
+  const [imageDefault, setImageDefault] = useState('');
   const handleDialogClose = () => {
     setOpenDialog(false);
+    lightsourceCCT(imageDefault);
   };
 
   const CarthandleDialogOpen = (imagePath) => {
@@ -439,10 +441,12 @@ const handleFurnitureButtonClick = () => {
   // 세민 궁금해요 : cards_21561263, cards_20394197 cards_12137732
   // 유경 궁금해요 : cards_8486233 cards_17760123 cards_4143928 cards_10687665
   const loadDefaultImage = async () => {
-    const image = await import('./img/cards_4930502.jpg');
+    const image = await import('./img/cards_23386963.jpg');
     setBackgroundImage(image.default);
     console.log("image", image.default)
-    selectedImageToServer(image.default)
+    selectedImageToServer(image.default);
+    lightsourceCCT(image.default);
+    setImageDefault(image.default);
     setPageNum(0);
 
     // 메인 슬라이더 값을 null로 초기화
@@ -478,6 +482,7 @@ const handleFurnitureButtonClick = () => {
     console.log('imgPath',imgpath)
     setBackgroundImage(imgpath);
     selectedImageToServer(imgpath); //오브젝트 정보 받아오기 --> 토글 비활성화
+    lightsourceCCT(imgpath);
     // pageNum을 0으로 설정
     setPageNum(0);
 
@@ -695,7 +700,16 @@ const handleFurnitureButtonClick = () => {
           <Grid Grid container spacing={2}>
           <Grid item xs={0.3}></Grid>
             <Grid item xs={1.7}>
-              
+            {serverResponse && serverResponse["Mean Predict"] !== null && (
+            <>
+                <br />
+                광원의 평균 색온도: {serverResponse["Mean Predict"]}
+                <br />
+                <Typography variant="body2" sx={{ fontWeight: 'lighter' }}>
+                    색온도: {serverResponse["Predict"].join(', ')}
+                </Typography>
+            </>
+              )}
               <Card
                 sx={{ width: '400px', height: '240px', display: 'flex', flexDirection: 'column', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
