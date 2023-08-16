@@ -492,7 +492,7 @@ const handleFurnitureButtonClick = () => {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <main>
-        <Container sx={{ py:6}} maxWidth="false" >
+        <Container sx={{ py:7}} maxWidth="false" >
           <Grid container spacing={0} justifyContent="flex-end">
             <Grid item xs={1.8}>
               <Button
