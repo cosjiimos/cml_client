@@ -372,7 +372,7 @@ const handleFurnitureButtonClick = () => {
   const imghandleOpen = (image) => {
     setSelectedImage(image);
     // selectedImageToServer(image); // 이미지 이름을 서버로 전송 후  cct 받던거
-    console.log('Large image : ', image) //이거를 가져와 셈아
+    // console.log('Large image : ', image) //이거를 가져와 셈아
     setOpen(true);
   };
 
@@ -572,20 +572,13 @@ const handleFurnitureButtonClick = () => {
                             display: 'flex',
                             flexDirection: 'column', // 세로 방향으로 정렬
                             alignItems: 'center', // 가운데 정렬
-                            gap: 1 // 카드와 슬라이더 사이의 간격
+                            gap: 10 // 카드와 슬라이더 사이의 간격
                           }}
                         >
                       <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '50px'}}>
                         <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000',fontFamily: '"futura", sans-serif',fontWeight: 'bold'}}>Original Image</Typography>
                       </Card>
-                      {/* {Object.keys(cctInfo).map((key, index) => (
-                        cctInfo[key]
-                        ? <Box key={index} sx={{ display: 'flex',  fontSize: '14px', padding: '0px', marginLeft: '200px' }}>
-                            {capitalizeFirstLetter(key)} : {cctInfo[key]}
-                          </Box>
-                        : null
-                        ))}
-                         */}
+                      <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>세민짱!</Typography> 
                       </Box>
                       <Box
                         sx={{
@@ -673,9 +666,6 @@ const handleFurnitureButtonClick = () => {
                     <ImageSearchIcon fontSize="small" />
                   </Button>
                 </Box>
-                <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="md">
-                    <img src={backgroundImage} style={{ width: '100%', height: '100%' }} />
-                </Dialog>
               </Card>
               <Box sx={{ mb: 2 }} />
             <Grid item>
@@ -843,18 +833,19 @@ const handleFurnitureButtonClick = () => {
                         <CloseIcon />
                       </Button>
                     </Box>
-                    <Box sx={{ display: 'flex', height: '100%',marginTop : '100px' }}>
+                    <Box sx={{ display: 'flex', height: '100%',marginTop : '100px'  }}>
                     <Box
                           sx={{
                             display: 'flex',
                             flexDirection: 'column', // 세로 방향으로 정렬
                             alignItems: 'center', // 가운데 정렬
-                            gap: 1 // 카드와 슬라이더 사이의 간격
+                            gap: 10 
                           }}
                         >
                       <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '50px'}}>
                         <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000' }}>Original Image</Typography>
                       </Card>
+                      <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>세민짱!</Typography> 
                       </Box>
                       <Box
                         sx={{
@@ -909,21 +900,9 @@ const handleFurnitureButtonClick = () => {
               ))}
             </Grid>
 
-            <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="lg">
-              <Grid container>
-                <Grid item xs={10}>
+            <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="md">
                   <img src={selectedImage} style={{ width: '100%', height: '100%' }} />
-                </Grid>
-                <Grid item xs={2}>
-                  {/* {Object.keys(cctInfo).map((key, index) => (
-                    cctInfo[key]
-                      ? <Box key={index} sx={{ display: 'flex', alignItems: 'center', padding: 1 }}>
-                          {capitalizeFirstLetter(key)} : {cctInfo[key]}
-                        </Box>
-                      : null
-                  ))} */}
-                </Grid>
-              </Grid>
+
             </Dialog>
           </Grid>
       </Grid>
