@@ -187,7 +187,7 @@ export default function Album () {
     SimulationDataToServer(imagePath, simsliderValue);
     }
   };
-  
+
   const [imageDefault, setImageDefault] = useState('');
   const handleDialogClose = () => {
     setOpenDialog(false);
@@ -437,11 +437,11 @@ const handleFurnitureButtonClick = () => {
 //   }
 // `;
 
-  // 잘 나와요 : cards_5294632()  cards_23386963(노랑거)
+  // 잘 나와요 : cards_5294632()  cards_23386963(노랑거) cards_19557257(블랙소파) cards_17354717(브라운소파)
   // 세민 궁금해요 : cards_21561263, cards_20394197 cards_12137732
   // 유경 궁금해요 : cards_8486233 cards_17760123 cards_4143928 cards_10687665
   const loadDefaultImage = async () => {
-    const image = await import('./img/cards_23386963.jpg');
+    const image = await import('./img/cards_19557257.jpg');
     setBackgroundImage(image.default);
     console.log("image", image.default)
     selectedImageToServer(image.default);
