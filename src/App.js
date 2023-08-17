@@ -441,7 +441,7 @@ const handleFurnitureButtonClick = () => {
   // 세민 궁금해요 : cards_21561263, cards_20394197 cards_12137732
   // 유경 궁금해요 : cards_8486233 cards_17760123 cards_4143928 cards_10687665
   const loadDefaultImage = async () => {
-    const image = await import('./img/cards_23667400.jpg');
+    const image = await import('./img/cards_12640188.jpg');
     setBackgroundImage(image.default);
     console.log("image", image.default)
     selectedImageToServer(image.default);
@@ -515,475 +515,516 @@ const handleFurnitureButtonClick = () => {
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
-  
 
+  //웹페이지 시작!
+  const [showWebpage, setShowWebpage] = useState(false);
+  const handleToggleWebpage = () => {
+    setShowWebpage((prevValue) => !prevValue);
+    const currentTime = new Date().toLocaleTimeString();
+    console.log('Start time:', currentTime)
+
+  //현재 시각 보내기(Start & End)
+  };
+  const handlePrintTime = () => {
+    const currentTime = new Date().toLocaleTimeString();
+    console.log('End time:', currentTime);
+    
+  };
 
  //버튼&슬라이더 변경! 
-  return (
+  return ( 
     <ThemeProvider theme={darkTheme}>
+
+      
       <CssBaseline />
       <main>
-        <Container sx={{ py:6}} maxWidth="false" >
+      {!showWebpage && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '350px' }}>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                handleToggleWebpage();
+              }}
+              sx={{ fontWeight: 'bold', width: '90px', height: '40px', color: 'black', borderColor: 'black' }}
+            >
+              start
+            </Button>
+          </Box>
+      )}
 
+      {showWebpage && (
+      <Container sx={{ py:6}} maxWidth="false" >
+
+        
+      <Grid container spacing={0}>
+        <Grid item xs={9} sx={{ marginLeft: '65px', marginRight: '180px' }}>
+          {serverResponse && serverResponse["Mean Predict"] !== null && (
+            <div style={{ 
+              display: 'flex',
+              flexDirection: 'column', // 위아래로 배치
+              alignItems: 'flex-start', // 왼쪽 정렬
+              borderLeft: '2px solid #999', 
+              paddingLeft: '10px', 
+              width: `${
+                Math.max(
+                  serverResponse["Mean Predict"].length,
+                  serverResponse["Predict"].join(', ').length
+                ) * 50 + 50
+              }px`,
+              height: `65px` 
+            }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                광원의 평균 색온도: {serverResponse["Mean Predict"]}
+              </Typography>
+              <Typography variant="body1" sx={{ fontWeight: 'bold', marginTop: '7px' }}>
+                색온도: {serverResponse["Predict"].join(', ')}
+              </Typography>
+            </div>
+          )}
+        </Grid>
           
-        <Grid container spacing={0}>
-  <Grid item xs={9} sx={{ marginLeft: '65px', marginRight: '180px' }}>
-    {serverResponse && serverResponse["Mean Predict"] !== null && (
-      <div style={{ 
-        border: '2px solid #999', 
-        borderRadius: '7px', 
-        padding: '10px', 
-        width: '400px', 
-        height: '65px' 
-      }}>
-        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-          광원의 평균 색온도: {serverResponse["Mean Predict"]}
-        </Typography>
-        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-          색온도: {serverResponse["Predict"].join(', ')}
-        </Typography>
-      </div>
-    )}
-  </Grid>
-            
-            <Grid item xs={1.8}>
-              <Button
-                variant="outlined"
-                endIcon={<AddShoppingCartIcon/>}
-                sx={{ fontWeight: 'bold', width: '90px', height: '40px', color: 'gray', borderColor: 'gray', marginRight: '5px' }} onClick={handleViewSelectedImages}
-              >
-                Cart
-              </Button>
-              <Dialog open={viewSelectedImages} onClose={handleCloseSelectedImages}  maxWidth="false " PaperProps={{
-                  style: {
-                    height: '100%', 
-                    width: '100%', 
-                  },
-                }}>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
+          <Grid item xs={1.8}>
+            <Button
+              variant="outlined"
+              endIcon={<AddShoppingCartIcon/>}
+              sx={{ fontWeight: 'bold', width: '90px', height: '40px', color: 'gray', borderColor: 'gray', marginRight: '5px' }} onClick={handleViewSelectedImages}
+            >
+              Cart
+            </Button>
+            <Dialog open={viewSelectedImages} onClose={handleCloseSelectedImages}  maxWidth="false " PaperProps={{
+                style: {
+                  height: '100%', 
+                  width: '100%', 
+                },
+              }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 3 }}>
+                 <Box>
+                  <Button
+                    variant="outlined"
+                    sx={{ fontWeight: 'bold', width: '90px', height: '40px', color: 'gray', borderColor: 'gray' }} onClick={handlePrintTime}>
+                    End
+                  </Button>
+                </Box>
                   <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={handleCloseSelectedImages}>
                     <CloseIcon></CloseIcon>
-                  </Button></Box>
-                  
-                <Grid container spacing={6}>
-                  {cartImages.map((imgPair, index) => (
-                    <Grid item xs={12} sm={4} md={4} lg={2} key={index}>
-                      <Card
-                        sx={{
-                          width: '100%',
-                          height: '240px',
-                          backgroundImage: `url(${simulatedImages[index] || imgPair.simulated || imgPair.original})`, // 시뮬레이션 이미지가 없으면 원래 이미지 사용
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          margin: ' 20px'
-                        }}
-                      >
-                  
+                  </Button>
+                </Box>
+                
+              <Grid container spacing={6}>
+                {cartImages.map((imgPair, index) => (
+                  <Grid item xs={12} sm={4} md={4} lg={2} key={index}>
+                    <Card
+                      sx={{
+                        width: '100%',
+                        height: '240px',
+                        backgroundImage: `url(${simulatedImages[index] || imgPair.simulated || imgPair.original})`, // 시뮬레이션 이미지가 없으면 원래 이미지 사용
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        margin: ' 20px'
+                      }}
+                    >
+                
 
-                      {/* 오른쪽 위에 위치할 나머지 버튼들 */}
-                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
-                          <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(imgPair.original)}>
-                              <ImageSearchIcon fontSize="small" />
+                    {/* 오른쪽 위에 위치할 나머지 버튼들 */}
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
+                        <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(imgPair.original)}>
+                            <ImageSearchIcon fontSize="small" />
+                        </Button>
+                        <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(imgPair.original)}>
+                        { cartImages.some(pair => pair.original === imgPair.original) ?  (
+                                <RemoveShoppingCartIcon fontSize="small" /> // 이미지가 선택된 경우
+                            ) : (
+                                <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
+                            )}
+                        </Button>
+                          {/* // 시뮬레이션  */}
+                          <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => { 
+                              CarthandleDialogOpen(imgPair.original); 
+                              setCurrentImageIndex(index);
+                          }}>
+                              <AutoFixHighIcon fontSize="small" />
                           </Button>
-                          <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(imgPair.original)}>
-                          { cartImages.some(pair => pair.original === imgPair.original) ?  (
-                                  <RemoveShoppingCartIcon fontSize="small" /> // 이미지가 선택된 경우
-                              ) : (
-                                  <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
-                              )}
-                          </Button>
-                            {/* // 시뮬레이션  */}
-                            <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => { 
-                                CarthandleDialogOpen(imgPair.original); 
-                                setCurrentImageIndex(index);
-                            }}>
-                                <AutoFixHighIcon fontSize="small" />
-                            </Button>
 
-
-                    
 
                   
 
+                
 
-                  <Dialog open={openCartDialog} onClose={CarthandleDialogClose} maxWidth="false" PaperProps={{
-                    style: {
-                      height: '80%', 
-                      width: '80%', 
-                    },
-                  }}>
 
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
-                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={CarthandleDialogClose}>
-                        <CloseIcon />
-                      </Button>
-                    </Box>
-                    <Box sx={{ display: 'flex', height: '100%',marginTop : '100px' }}>
-                    <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'column', // 세로 방향으로 정렬
-                            alignItems: 'center', // 가운데 정렬
-                            gap: 10 // 카드와 슬라이더 사이의 간격
-                          }}
-                        >
-                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '15px'}}>
-                        <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000',fontFamily: '"futura", sans-serif',fontWeight: 'bold'}}>Original Image</Typography>
-                      </Card>
-                      <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>
-                      {serverResponse && serverResponse["Mean Predict"] !== null && (
-                            <>
-                                <br />
-                                광원의 평균 색온도: {serverResponse["Mean Predict"]}
-                                <br />
-                                <Typography variant="body2" sx={{ fontWeight: 'lighter' }}>
-                                    색온도: {serverResponse["Predict"].join(', ')}
-                                </Typography>
-                            </>
-                        )}
-                      </Typography>
-                      </Box>
-                      <Box
+                <Dialog open={openCartDialog} onClose={CarthandleDialogClose} maxWidth="false" PaperProps={{
+                  style: {
+                    height: '80%', 
+                    width: '80%', 
+                  },
+                }}>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={CarthandleDialogClose}>
+                      <CloseIcon />
+                    </Button>
+                  </Box>
+                  <Box sx={{ display: 'flex', height: '100%',marginTop : '100px' }}>
+                  <Box
                         sx={{
                           display: 'flex',
                           flexDirection: 'column', // 세로 방향으로 정렬
                           alignItems: 'center', // 가운데 정렬
                           gap: 10 // 카드와 슬라이더 사이의 간격
-                          , marginLeft: '200px'
                         }}
                       >
-                        <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${simulatedImage})`, backgroundSize: 'cover', 
-                        backgroundPosition: 'center' }}>
-                          <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '1380px', color: '#000' ,fontWeight: 'bold'}}>Simulation Image</Typography>
-                        </Card>
-                        
-                        <Slider 
-                          value={simsliderValue}
-                          onChange={handleSimulationChange} 
-                          defaultValue={2850}
-                          aria-label="Default" 
-                          valueLabelDisplay="auto" 
-                          size="large" 
-                          sx={{ width: '360px', color: '#000' }} 
-                          max={7500} min={2850}
-                          marks={[
-                            { value: 2850, label: <Typography style={{ fontSize: '18px', fontWeight: 'bold' }}>2850k</Typography> },
-                            { value: 7500, label: <Typography style={{ fontSize: '18px' , fontWeight: 'bold'}}>7500k</Typography> },
-                      
-                        ]} />
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
-                          <Button variant="filled" endIcon={<ChangeCircleIcon/>} sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => SimulhandleSendClick(currentImageIndex,simulatedImage)}>
-                          simulation image
-                          </Button>
-                          <Button variant="filled" endIcon={<RestartAltIcon/>} sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => SimulhandleResetClick(currentImageIndex,dialogImage )}>
-                        origirnal image
-                      </Button>
-                          
-                        </Box>
-                      </Box>
-                    
-                  </Box>
-                </Dialog>
-
-
-                  
-                  </Box>
+                    <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '15px'}}>
+                      <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000',fontFamily: '"futura", sans-serif',fontWeight: 'bold'}}>Original Image</Typography>
                     </Card>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Dialog>
-              <Button
-                variant="outlined"
-                endIcon={<DeleteIcon  />}
-                sx={{ fontWeight: 'bold', width: '90px', height: '40px', color: 'gray', borderColor: 'gray', marginLeft: '20px' }} onClick={loadDefaultImage}>
-                Reset
-              </Button>
-              <IconButton onClick={handleUpClick} disabled={pageNum === 0}>
-                <KeyboardArrowUpRoundedIcon sx={{ fontSize: 40}} />
-              </IconButton>
-              <IconButton onClick={handleDownClick}>
-                <KeyboardArrowDownRoundedIcon sx={{ fontSize: 40 }} />
-              </IconButton>
-              
-            </Grid>
-            {/* <Grid item xs={0.5}>
-              <Divider orientation="vertical" />
-            </Grid> */}
-          </Grid>           
-        </Container>
-
-        {/* <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '400px' }}>
-            <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={loadDefaultImage}>
-              <RestartAltIcon></RestartAltIcon>
-        </Button></Box> */}
-
-        <Container sx={{ py: 0 }} maxWidth={false}>
-          <Grid Grid container spacing={1}>
-          <Grid item xs={0.3}></Grid>
-            <Grid item xs={1.7}>
-            
-              <Card
-                sx={{ width: '400px', height: '240px', display: 'flex', flexDirection: 'column', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                  <Button variant="filled" sx={{ color: '#fff', fontWeight: 'bold' ,width : '10px'}} onClick={() => imghandleOpen(backgroundImage)}>
-                    <ImageSearchIcon fontSize="small" />
-                  </Button>
+                    <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>
+                    {serverResponse && serverResponse["Mean Predict"] !== null && (
+                          <>
+                              <br />
+                              광원의 평균 색온도: {serverResponse["Mean Predict"]}
+                              <br />
+                              <Typography variant="body2" sx={{ fontWeight: 'lighter' }}>
+                                  색온도: {serverResponse["Predict"].join(', ')}
+                              </Typography>
+                          </>
+                      )}
+                    </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column', // 세로 방향으로 정렬
+                        alignItems: 'center', // 가운데 정렬
+                        gap: 10 // 카드와 슬라이더 사이의 간격
+                        , marginLeft: '200px'
+                      }}
+                    >
+                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${simulatedImage})`, backgroundSize: 'cover', 
+                      backgroundPosition: 'center' }}>
+                        <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '1380px', color: '#000' ,fontWeight: 'bold'}}>Simulation Image</Typography>
+                      </Card>
+                      
+                      <Slider 
+                        value={simsliderValue}
+                        onChange={handleSimulationChange} 
+                        defaultValue={2850}
+                        aria-label="Default" 
+                        valueLabelDisplay="auto" 
+                        size="large" 
+                        sx={{ width: '360px', color: '#000' }} 
+                        max={7500} min={2850}
+                        marks={[
+                          { value: 2850, label: <Typography style={{ fontSize: '18px', fontWeight: 'bold' }}>2850k</Typography> },
+                          { value: 7500, label: <Typography style={{ fontSize: '18px' , fontWeight: 'bold'}}>7500k</Typography> },
+                    
+                      ]} />
+                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
+                        <Button variant="filled" endIcon={<ChangeCircleIcon/>} sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => SimulhandleSendClick(currentImageIndex,simulatedImage)}>
+                        simulation image
+                        </Button>
+                        <Button variant="filled" endIcon={<RestartAltIcon/>} sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => SimulhandleResetClick(currentImageIndex,dialogImage )}>
+                      origirnal image
+                    </Button>
+                        
+                      </Box>
+                    </Box>
+                  
                 </Box>
-              </Card>
-              <Box sx={{ mb: 2 }} />
-            <Grid item>
-              <Button //(큰 버튼:Furniture)
-                variant="outlined"
-                sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',  width: '130px', height: '25px' }}
-                onClick={handleBackgroundButtonClick}
-              >
-                background
-              </Button>
-            </Grid>
-            {!showBackgroundButtons && // showButtons가 false인거 (큰 슬라이더:Background)
-              <Slider
-                value={mainBackSliderValue || 0}
-                defaultValue={0} 
-                aria-label="Default" 
-                valueLabelDisplay="auto" 
-                size="small" 
-                sx={{width: '400px', color: '#000'}} 
-                max={50} 
-                min={-50} 
-                onChange={handleBackMainSliderChange}
-                valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
-                marks={marks}
-            />}
-            {showBackgroundButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링 (작은 슬라이더 :Background)
-            <>
-            <Grid container>
-              <Box sx={{ mb: 2 }} />
-              {Back_controls.map((control, index) => (
-                <Grid item key={index}>
-                  <Button
-                    variant={control.disabled ? 'outlined' : 'filled'}
-                    sx={{ width: '130px', height: '25px', backgroundColor: control.disabled ? '#999' : '#000', color:  '#fff', borderColor :control.disabled ? '#999' : '#000', fontWeight: 'bold' }}
-                    onClick={() => Back_toggleSlider(index)}
-                  >
-                    {control.name}
-                  </Button>
-                  <Slider
-                    value={backSliderValues[index] !== null ? backSliderValues[index] : 0}
-                    defaultValue={0}
-                    aria-label="Default"
-                    valueLabelDisplay="auto"
-                    size="small"
-                    sx={{ width: '400px', color: '#000' }} 
-                    disabled={control.disabled}
-                    onChange={(event, newValue) => handleBackSliderChange(index, event, newValue)}
-                    max={50} min={-50}
-                    valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
-                    marks={marks}
-                    />
-                    </Grid>
-                    ))}
-            </Grid>
+              </Dialog>
 
-              <Box sx={{ mb:2 }} />
-            </>
-           )}
-            <Grid item>
-              
-            <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' ,  width: '130px', height: '25px'}} //(큰 버튼:Furniture)
-            onClick={handleFurnitureButtonClick}>
-            Furniture</Button>
-            </Grid>
-            {!showFurnitureButtons && //(큰 슬라이더:Furniture)
-              <Slider 
-              value={mainFurnSliderValue || 0}
+
+                
+                </Box>
+                  </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Dialog>
+            <Button
+              variant="outlined"
+              endIcon={<DeleteIcon  />}
+              sx={{ fontWeight: 'bold', width: '90px', height: '40px', color: 'gray', borderColor: 'gray', marginLeft: '20px' }} onClick={loadDefaultImage}>
+              Reset
+            </Button>
+            <IconButton onClick={handleUpClick} disabled={pageNum === 0}>
+              <KeyboardArrowUpRoundedIcon sx={{ fontSize: 40}} />
+            </IconButton>
+            <IconButton onClick={handleDownClick}>
+              <KeyboardArrowDownRoundedIcon sx={{ fontSize: 40 }} />
+            </IconButton>
+            
+          </Grid>
+          {/* <Grid item xs={0.5}>
+            <Divider orientation="vertical" />
+          </Grid> */}
+        </Grid>           
+      </Container>
+      )}
+
+      {showWebpage && (
+      <Container sx={{ py: 0 }} maxWidth={false}>
+        <Grid Grid container spacing={1}>
+        <Grid item xs={0.3}></Grid>
+          <Grid item xs={1.7}>
+          
+            <Card
+              sx={{ width: '400px', height: '240px', display: 'flex', flexDirection: 'column', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                <Button variant="filled" sx={{ color: '#fff', fontWeight: 'bold' ,width : '10px'}} onClick={() => imghandleOpen(backgroundImage)}>
+                  <ImageSearchIcon fontSize="small" />
+                </Button>
+              </Box>
+            </Card>
+            <Box sx={{ mb: 2 }} />
+          <Grid item>
+            <Button //(큰 버튼:Furniture)
+              variant="outlined"
+              sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',  width: '130px', height: '25px' }}
+              onClick={handleBackgroundButtonClick}
+            >
+              background
+            </Button>
+          </Grid>
+          {!showBackgroundButtons && // showButtons가 false인거 (큰 슬라이더:Background)
+            <Slider
+              value={mainBackSliderValue || 0}
               defaultValue={0} 
               aria-label="Default" 
               valueLabelDisplay="auto" 
               size="small" 
               sx={{width: '400px', color: '#000'}} 
-              max={50} min={-50} 
-              onChange={handleFurnMainSliderChange}
+              max={50} 
+              min={-50} 
+              onChange={handleBackMainSliderChange}
               valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
               marks={marks}
-              />
-            }
-            {showFurnitureButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링  (작은 슬라이더:Furniture)
-            <><Box sx={{ mb: 2 }} />
-            <Grid container>
-                  {Furn_controls.map((control, index) => (
-                    <Grid item key={index}>
-                      <Button
-                        variant={control.disabled ? 'outlined' : 'filled'}
-                        sx={{ width: '130px', height: '25px', backgroundColor: control.disabled ? '#999' : '#000', color:  '#fff', borderColor :control.disabled ? '#999' : '#000', fontWeight: 'bold' }}
-                        onClick={() => Furn_toggleSlider(index)}
-                      >
-                        {control.name}
-                      </Button>
-                      <Slider
-                        value={furnSliderValues[index] !== null ? furnSliderValues[index] : 0}
-                        defaultValue={0}
-                        aria-label="Default"
-                        valueLabelDisplay="auto"
-                        size="small"
-                        sx={{ width: '400px', color: '#000' }}
-                        disabled={control.disabled}
-                        onChange={(event, newValue) => handleFurnSliderChange(index, event, newValue)}
-                        max={50} min={-50}
-                        valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
-                        marks={marks}
-                      />
-                    </Grid>
-                  ))}
-            </Grid>
-              <Box sx={{ mb: 1 }} />
-            </>
-           )}
-            <Box sx={{ mb: 2.5 }} />
-            <Grid item>
-              <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',marginLeft : '310px' }} endIcon={<SendIcon />} 
-              onClick={handleSendClick}
-              disabled={!isSendEnabled()}>
-                Send
-              </Button>
-            </Grid>
-            
-            
-
-
-          </Grid>
-          <Grid item xs={0.7}></Grid>
-          <Grid item xs={9.3}>
-            <Grid container spacing={9}>
-              {currentImagePaths.map((imgPath, index) => (
-              // 카드 크기에 맞춰서 줌인
-              <Grid item xs={3} key={index}>
-                <Card
-                  sx={{ width: '90%', height: '250px', backgroundImage: `url(${imgPath})`, backgroundSize: 'cover', backgroundPosition: 'center', border: cartImages.some(pair => pair.original === imgPath) ? '5px solid #CF4ECB' : 'Other Value'}}               
+          />}
+          {showBackgroundButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링 (작은 슬라이더 :Background)
+          <>
+          <Grid container>
+            <Box sx={{ mb: 2 }} />
+            {Back_controls.map((control, index) => (
+              <Grid item key={index}>
+                <Button
+                  variant={control.disabled ? 'outlined' : 'filled'}
+                  sx={{ width: '130px', height: '25px', backgroundColor: control.disabled ? '#999' : '#000', color:  '#fff', borderColor :control.disabled ? '#999' : '#000', fontWeight: 'bold' }}
+                  onClick={() => Back_toggleSlider(index)}
                 >
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
-                    
-                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => loadImage(`url(${imgPath})`)}>
-                      <ChangeCircleIcon fontSize="small" />
-                    </Button>
-                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(imgPath)}>
-                      <ImageSearchIcon fontSize="small" />
-                    </Button>
-                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(imgPath)}>
-                    { cartImages.some(pair => pair.original === imgPath) ?  (
-                        <RemoveShoppingCartIcon fontSize="small" /> // 이미지가 선택된 경우
-                      ) : (
-                        <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
-                      )}
-                    </Button>
+                  {control.name}
+                </Button>
+                <Slider
+                  value={backSliderValues[index] !== null ? backSliderValues[index] : 0}
+                  defaultValue={0}
+                  aria-label="Default"
+                  valueLabelDisplay="auto"
+                  size="small"
+                  sx={{ width: '400px', color: '#000' }} 
+                  disabled={control.disabled}
+                  onChange={(event, newValue) => handleBackSliderChange(index, event, newValue)}
+                  max={50} min={-50}
+                  valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
+                  marks={marks}
+                  />
+                  </Grid>
+                  ))}
+          </Grid>
 
-                  {/* // 시뮬레이션  */}
-                  <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => handleDialogOpen(imgPath)}>
-                    <AutoFixHighIcon fontSize="small" />
+            <Box sx={{ mb:2 }} />
+          </>
+          )}
+          <Grid item>
+            
+          <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold' ,  width: '130px', height: '25px'}} //(큰 버튼:Furniture)
+          onClick={handleFurnitureButtonClick}>
+          Furniture</Button>
+          </Grid>
+          {!showFurnitureButtons && //(큰 슬라이더:Furniture)
+            <Slider 
+            value={mainFurnSliderValue || 0}
+            defaultValue={0} 
+            aria-label="Default" 
+            valueLabelDisplay="auto" 
+            size="small" 
+            sx={{width: '400px', color: '#000'}} 
+            max={50} min={-50} 
+            onChange={handleFurnMainSliderChange}
+            valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
+            marks={marks}
+            />
+          }
+          {showFurnitureButtons && ( // showButtons가 true일 때만 아래 버튼들을 렌더링  (작은 슬라이더:Furniture)
+          <><Box sx={{ mb: 2 }} />
+          <Grid container>
+                {Furn_controls.map((control, index) => (
+                  <Grid item key={index}>
+                    <Button
+                      variant={control.disabled ? 'outlined' : 'filled'}
+                      sx={{ width: '130px', height: '25px', backgroundColor: control.disabled ? '#999' : '#000', color:  '#fff', borderColor :control.disabled ? '#999' : '#000', fontWeight: 'bold' }}
+                      onClick={() => Furn_toggleSlider(index)}
+                    >
+                      {control.name}
+                    </Button>
+                    <Slider
+                      value={furnSliderValues[index] !== null ? furnSliderValues[index] : 0}
+                      defaultValue={0}
+                      aria-label="Default"
+                      valueLabelDisplay="auto"
+                      size="small"
+                      sx={{ width: '400px', color: '#000' }}
+                      disabled={control.disabled}
+                      onChange={(event, newValue) => handleFurnSliderChange(index, event, newValue)}
+                      max={50} min={-50}
+                      valueLabelFormat={(value) => (value === 0 ? 'none' : value)}
+                      marks={marks}
+                    />
+                  </Grid>
+                ))}
+          </Grid>
+            <Box sx={{ mb: 1 }} />
+          </>
+          )}
+          <Box sx={{ mb: 2.5 }} />
+          <Grid item>
+            <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',marginLeft : '310px' }} endIcon={<SendIcon />} 
+            onClick={handleSendClick}
+            disabled={!isSendEnabled()}>
+              Send
+            </Button>
+          </Grid>
+          
+          
+
+
+        </Grid>
+        <Grid item xs={0.7}></Grid>
+        <Grid item xs={9.3}>
+          <Grid container spacing={9}>
+            {currentImagePaths.map((imgPath, index) => (
+            // 카드 크기에 맞춰서 줌인
+            <Grid item xs={3} key={index}>
+              <Card
+                sx={{ width: '90%', height: '250px', backgroundImage: `url(${imgPath})`, backgroundSize: 'cover', backgroundPosition: 'center', border: cartImages.some(pair => pair.original === imgPath) ? '5px solid #CF4ECB' : 'Other Value'}}               
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
+                  
+                  <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => loadImage(`url(${imgPath})`)}>
+                    <ChangeCircleIcon fontSize="small" />
+                  </Button>
+                  <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(imgPath)}>
+                    <ImageSearchIcon fontSize="small" />
+                  </Button>
+                  <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' ,padding: '2px 3px' }} onClick={() => toggleSelectImage(imgPath)}>
+                  { cartImages.some(pair => pair.original === imgPath) ?  (
+                      <RemoveShoppingCartIcon fontSize="small" /> // 이미지가 선택된 경우
+                    ) : (
+                      <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
+                    )}
                   </Button>
 
+                {/* // 시뮬레이션  */}
+                <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => handleDialogOpen(imgPath)}>
+                  <AutoFixHighIcon fontSize="small" />
+                </Button>
 
 
 
-                  <Dialog open={openDialog} onClose={handleDialogClose} maxWidth="false" PaperProps={{
-                    style: {
-                      height: '80%', 
-                      width: '80%', 
-                    },
-                    }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
-                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={handleDialogClose}>
-                        <CloseIcon />
-                      </Button>
-                    </Box>
-                    <Box sx={{ display: 'flex', height: '100%',marginTop : '100px'  }}>
-                    <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'column', // 세로 방향으로 정렬
-                            alignItems: 'center', // 가운데 정렬
-                            gap: 10 
-                          }}
-                        >
-                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '15px'}}>
-                        <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000' }}>Original Image</Typography>
-                      </Card>
-                      <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>
-                      {serverResponse && serverResponse["Mean Predict"] !== null && (
-                            <>
-                                <br />
-                                광원의 평균 색온도: {serverResponse["Mean Predict"]}
-                                <br />
-                                <Typography variant="body2" sx={{ fontWeight: 'lighter' }}>
-                                    색온도: {serverResponse["Predict"].join(', ')}
-                                </Typography>
-                            </>
-                        )}
-                    </Typography>
-                      </Box>
-                      <Box
+
+                <Dialog open={openDialog} onClose={handleDialogClose} maxWidth="false" PaperProps={{
+                  style: {
+                    height: '80%', 
+                    width: '80%', 
+                  },
+                  }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={handleDialogClose}>
+                      <CloseIcon />
+                    </Button>
+                  </Box>
+                  <Box sx={{ display: 'flex', height: '100%',marginTop : '100px'  }}>
+                  <Box
                         sx={{
                           display: 'flex',
                           flexDirection: 'column', // 세로 방향으로 정렬
                           alignItems: 'center', // 가운데 정렬
-                          gap: 10 // 카드와 슬라이더 사이의 간격
-                          , marginLeft: '200px'
+                          gap: 10 
                         }}
                       >
-                        <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${simulatedImage})`, backgroundSize: 'cover', 
-                        backgroundPosition: 'center' }}>
-                          <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '1380px', color: '#000' }}>Simulation Image</Typography>
-                        </Card>
-                        
-                        <Slider 
-                          value={simsliderValue}
-                          onChange={handleSimulationChange} 
-                          defaultValue={2850}
-                          aria-label="Default" 
-                          valueLabelDisplay="auto" 
-                          size="large" 
-                          sx={{ width: '360px', color: '#000' }} 
-                          max={7500} min={2850}
-                          marks={[
-                            { value: 2850, label: <Typography style={{ fontSize: '18px', fontWeight: 'bold' }}>2850k</Typography> },
-                            { value: 7500, label: <Typography style={{ fontSize: '18px' , fontWeight: 'bold'}}>7500k</Typography> },
+                    <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '15px'}}>
+                      <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000' }}>Original Image</Typography>
+                    </Card>
+                    <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>
+                    {serverResponse && serverResponse["Mean Predict"] !== null && (
+                          <>
+                              <br />
+                              광원의 평균 색온도: {serverResponse["Mean Predict"]}
+                              <br />
+                              <Typography variant="body2" sx={{ fontWeight: 'lighter' }}>
+                                  색온도: {serverResponse["Predict"].join(', ')}
+                              </Typography>
+                          </>
+                      )}
+                  </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column', // 세로 방향으로 정렬
+                        alignItems: 'center', // 가운데 정렬
+                        gap: 10 // 카드와 슬라이더 사이의 간격
+                        , marginLeft: '200px'
+                      }}
+                    >
+                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${simulatedImage})`, backgroundSize: 'cover', 
+                      backgroundPosition: 'center' }}>
+                        <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '1380px', color: '#000' }}>Simulation Image</Typography>
+                      </Card>
                       
-                        ]} />
-                      <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={() => toggleSelectImage(dialogImage, simulatedImage)}>
-                          { cartImages.some(pair => pair.original === dialogImage) ?  (
-                              <>
-                                Simulated Image {/* 선택된 경우의 텍스트 */}
-                                <RemoveShoppingCartIcon fontSize="large" /> {/* 이미지가 선택된 경우 */}   
-                              </>
-                          ) : (
-                              <>
-                                Simulated Image {/* 선택되지 않은 경우의 텍스트 */}
-                                <AddShoppingCartIcon fontSize="large" /> {/* 이미지가 선택되지 않은 경우 */}
-                              </>
-                          )}
-                      </Button>
-                      </Box>
+                      <Slider 
+                        value={simsliderValue}
+                        onChange={handleSimulationChange} 
+                        defaultValue={2850}
+                        aria-label="Default" 
+                        valueLabelDisplay="auto" 
+                        size="large" 
+                        sx={{ width: '360px', color: '#000' }} 
+                        max={7500} min={2850}
+                        marks={[
+                          { value: 2850, label: <Typography style={{ fontSize: '18px', fontWeight: 'bold' }}>2850k</Typography> },
+                          { value: 7500, label: <Typography style={{ fontSize: '18px' , fontWeight: 'bold'}}>7500k</Typography> },
+                    
+                      ]} />
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={() => toggleSelectImage(dialogImage, simulatedImage)}>
+                        { cartImages.some(pair => pair.original === dialogImage) ?  (
+                            <>
+                              Simulated Image {/* 선택된 경우의 텍스트 */}
+                              <RemoveShoppingCartIcon fontSize="large" /> {/* 이미지가 선택된 경우 */}   
+                            </>
+                        ) : (
+                            <>
+                              Simulated Image {/* 선택되지 않은 경우의 텍스트 */}
+                              <AddShoppingCartIcon fontSize="large" /> {/* 이미지가 선택되지 않은 경우 */}
+                            </>
+                        )}
+                    </Button>
                     </Box>
                   </Box>
-                </Dialog>
+                </Box>
+              </Dialog>
 
 
-                  </Box>
-                </Card>
-              </Grid>
-
-              ))}
+                </Box>
+              </Card>
             </Grid>
 
-            <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="md">
-                  <img src={selectedImage} style={{ width: '100%', height: '100%' }} />
-
-            </Dialog>
+            ))}
           </Grid>
-      </Grid>
-    </Container>
-        
+
+          <Dialog open={open} onClose={imghandleClose} fullWidth={true} maxWidth="md">
+                <img src={selectedImage} style={{ width: '100%', height: '100%' }} />
+          </Dialog>
+        </Grid>
+    </Grid>
+  </Container>
+      )}
         
       </main>
     </ThemeProvider>
