@@ -28,7 +28,7 @@ import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-axios.defaults.baseURL = "http://166.104.34.158:5008";
+axios.defaults.baseURL = "http://166.104.34.158:5002";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -152,11 +152,13 @@ export default function Album () {
   };
 
   //시뮬레이션 이미지와 슬라이더 바의 값을 가져오는 함슈
-  async function SimulationDataToServer (simulImage, cctValues){
+  async function SimulationDataToServer (simulImage, cctValues, location, backgroundImage){
     try {
       const response = await axios.post('/simulation',{
         simulImage: simulImage,
         cctValues: cctValues,
+        location: location,  // 위치 정보 추가
+        backgroundImage: backgroundImage
       });
       console.log(response.data)
       setSimulatedImage(response.data.image); // 받은 이미지를 상태로 설정
@@ -183,7 +185,7 @@ export default function Album () {
     setSimulatedImages(newSimulatedImages);
 
     // Send 버튼을 누르면 서버로 데이터 전송
-    SimulationDataToServer(dialogImage, simsliderValue);
+    SimulationDataToServer(dialogImage, simsliderValue, "cart_send");
     console.log('cart_simulation send', dialogImage, simsliderValue)
 };
 
@@ -192,12 +194,19 @@ export default function Album () {
     const updatedSimulatedImages = [...simulatedImages];
     updatedSimulatedImages[index] = dialogImage; // 원래 이미지로 복구
     setSimulatedImages(updatedSimulatedImages);
+    SimulationDataToServer(dialogImage, simsliderValue, "cart_cancel");
   };
 
 
   useEffect(() => {
-    if(simsliderValue !== null) {
-      SimulationDataToServer(dialogImage, simsliderValue)
+    if(simsliderValue !== null && dialogImage !== null) {
+      let location = "0"
+        if (openDialog) {
+          location = "dialog";
+      } else if (openCartDialog) {
+          location = "cart";
+      }
+      SimulationDataToServer(dialogImage, simsliderValue, location);
     }
     ; // simsliderValue 값이 변경될 때마다 서버로 전송
   }, [simsliderValue, dialogImage]);
@@ -211,9 +220,9 @@ export default function Album () {
     setOpenDialog(true);
     lightsourceCCT(imagePath); //셈 slightsource
     // console.log("lightsourceCCT_imagePath", imagePath);
-    if(simsliderValue !== null) {
-    SimulationDataToServer(imagePath, simsliderValue);
-    }
+    // if(simsliderValue !== null) {
+    // SimulationDataToServer(imagePath, simsliderValue, "dialog");
+    // }
   };
 
   const [imageDefault, setImageDefault] = useState('');
@@ -227,9 +236,9 @@ export default function Album () {
     setOpenCartDialog(true);
     lightsourceCCT(imagePath); //셈 slightsource
     // console.log("lightsourceCCT2_imagePath", imagePath);
-    if(simsliderValue !== null) {
-    SimulationDataToServer(imagePath, simsliderValue);
-    }
+    // if(simsliderValue !== null) {
+    // SimulationDataToServer(imagePath, simsliderValue, "cart");
+    // }
   };
   
   const CarthandleDialogClose = () => {
@@ -356,20 +365,11 @@ const handleFurnitureButtonClick = () => {
   };
 
 
-  // const toggleSelectImage = (image) => {
-  //   if (cartImages.includes(image)) {
-  //     setcartImages(prev => prev.filter(img => img !== image));
-  //   } else {
-  //     setcartImages(prev => [...prev, image]);
-  //   }
-  // };
-
     // [로그 저장 2]  장바구니 이미지와 Background (Target) 이미지를 받아오는 함수 
     async function CartDataToServer (originalCart, targetImage){
       try {
         const response = await axios.post('/cartData',{
-          originalCart: originalCart,
-          targetImage: backgroundImage,
+          originalCart: originalCart
         });
         console.log(response.data)
     } catch (error) {
@@ -377,7 +377,7 @@ const handleFurnitureButtonClick = () => {
     }
   };
 
-  //장바구니 이미지를 서버로 보내서 cct값을 받아오는 함수
+  //장바구니 이미지를 서버로 보내서 광원의 cct값을 받아오는 함수
   const [serverResponse, setServerResponse] = useState(null); 
   async function lightsourceCCT (cctimage){
     try {
@@ -407,12 +407,18 @@ const handleFurnitureButtonClick = () => {
     } else {
       // 존재하지 않으면 추가
       setcartImages(prev => [...prev, imagePair]);
+      if (simsliderValue !== null) {
+        SimulationDataToServer(dialogImage, simsliderValue, "dialog_send");
+    }
     }
   };
+
   // 셈 : cartImage 로그 
   useEffect(() => {
     console.log('cartImages :', cartImages);
-    CartDataToServer(cartImages);
+    if (cartImages.length > 0) {
+      CartDataToServer(cartImages);
+  }
   }, [cartImages])
 
   const handleUpClick = () => {
@@ -450,20 +456,6 @@ const handleFurnitureButtonClick = () => {
   ];
 
 
-//   const CustomSlider = styled(Slider)`
-//   & .MuiSlider-thumb {
-//     width: 20px;
-//     height: 20px;
-//   }
-//   & .MuiSlider-track {
-//     height: ${props => 5 - Math.abs(props.value)}px; // 중앙에서 가장 두꺼워지도록 함
-//     background: currentColor;
-//   }
-//   & .MuiSlider-rail {
-//     height: 1px; // 최대 두께로 설정
-//   }
-// `;
- 
   // 잘 나와요 : cards_5294632()   cards_23386963(노랑거)  cards_19557257(블랙소파)  cards_20309937  cards_12640188  cards_2366740 cards_7804689
   // 세민 궁금해요 : cards_21561263, cards_20394197 cards_12137732
   // 유경 궁금해요 : cards_8486233 cards_17760123 cards_4143928 cards_10687665
@@ -539,24 +531,39 @@ const handleFurnitureButtonClick = () => {
   const isSendEnabled = () => {
     return backSliderValues.some(value => value !== null) || furnSliderValues.some(value => value !== null);
   };
-  function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
 
   //웹페이지 시작!
   const [showWebpage, setShowWebpage] = useState(false);
-  const handleToggleWebpage = () => {
-    setShowWebpage((prevValue) => !prevValue);
-    const currentTime = new Date().toLocaleTimeString();
-    console.log('Start time:', currentTime)
+  // const handleToggleWebpage = () => {
+  //   setShowWebpage((prevValue) => !prevValue);
+  //   const currentTime = new Date().toLocaleTimeString();
+  //   console.log('Start time:', currentTime)
 
+  async function handleToggleWebpage  (){
+    setShowWebpage((prevValue) => !prevValue);
+    try{
+      const response = await axios.post('/starttime',{
+      });
+    } catch (error) {
+      console.error('Error sending start time:', error);
+    }
+  };
+
+  async function handlePrintTime  (){
+    try{
+      const response = await axios.post('/endtime',{
+      });
+    } catch (error) {
+      console.error('Error sending end time:', error);
+    }
+  };
   //현재 시각 보내기(Start & End)
-  };
-  const handlePrintTime = () => {
-    const currentTime = new Date().toLocaleTimeString();
-    console.log('End time:', currentTime);
+  // };
+  // const handlePrintTime = () => {
+  //   const currentTime = new Date().toLocaleTimeString();
+  //   console.log('End time:', currentTime);
     
-  };
+  // };
 
  //버튼&슬라이더 변경! 
   return ( 
