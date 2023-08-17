@@ -28,7 +28,7 @@ import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-axios.defaults.baseURL = "http://166.104.34.158:5002";
+axios.defaults.baseURL = "http://166.104.34.158:5008";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -156,7 +156,7 @@ export default function Album () {
 
     // Send 버튼을 누르면 서버로 데이터 전송
     SimulationDataToServer(dialogImage, simsliderValue);
-    console.log('simul', dialogImage, simsliderValue)
+    console.log('cart_simulation send', dialogImage, simsliderValue)
 };
 
   //카드 이미지 원래 이미지로 바꾸기
@@ -436,12 +436,12 @@ const handleFurnitureButtonClick = () => {
 //     height: 1px; // 최대 두께로 설정
 //   }
 // `;
-
-  // 잘 나와요 : cards_5294632()  cards_23386963(노랑거) cards_19557257(블랙소파) cards_20309937
+ 
+  // 잘 나와요 : cards_5294632()   cards_23386963(노랑거)  cards_19557257(블랙소파)  cards_20309937  cards_12640188  cards_2366740 cards_7804689
   // 세민 궁금해요 : cards_21561263, cards_20394197 cards_12137732
   // 유경 궁금해요 : cards_8486233 cards_17760123 cards_4143928 cards_10687665
   const loadDefaultImage = async () => {
-    const image = await import('./img/cards_19557257.jpg');
+    const image = await import('./img/cards_23667400.jpg');
     setBackgroundImage(image.default);
     console.log("image", image.default)
     selectedImageToServer(image.default);
@@ -523,8 +523,29 @@ const handleFurnitureButtonClick = () => {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <main>
-        <Container sx={{ py:7}} maxWidth="false" >
-          <Grid container spacing={0} justifyContent="flex-end">
+        <Container sx={{ py:6}} maxWidth="false" >
+
+          
+        <Grid container spacing={0}>
+  <Grid item xs={9} sx={{ marginLeft: '65px', marginRight: '180px' }}>
+    {serverResponse && serverResponse["Mean Predict"] !== null && (
+      <div style={{ 
+        border: '2px solid #999', 
+        borderRadius: '7px', 
+        padding: '10px', 
+        width: '400px', 
+        height: '65px' 
+      }}>
+        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+          광원의 평균 색온도: {serverResponse["Mean Predict"]}
+        </Typography>
+        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+          색온도: {serverResponse["Predict"].join(', ')}
+        </Typography>
+      </div>
+    )}
+  </Grid>
+            
             <Grid item xs={1.8}>
               <Button
                 variant="outlined"
@@ -606,7 +627,7 @@ const handleFurnitureButtonClick = () => {
                             gap: 10 // 카드와 슬라이더 사이의 간격
                           }}
                         >
-                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '50px'}}>
+                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '15px'}}>
                         <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000',fontFamily: '"futura", sans-serif',fontWeight: 'bold'}}>Original Image</Typography>
                       </Card>
                       <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>
@@ -646,8 +667,9 @@ const handleFurnitureButtonClick = () => {
                           sx={{ width: '360px', color: '#000' }} 
                           max={7500} min={2850}
                           marks={[
-                          { value: 2850, label: '2850K' },
-                          { value: 7500, label: '7500K' },
+                            { value: 2850, label: <Typography style={{ fontSize: '18px', fontWeight: 'bold' }}>2850k</Typography> },
+                            { value: 7500, label: <Typography style={{ fontSize: '18px' , fontWeight: 'bold'}}>7500k</Typography> },
+                      
                         ]} />
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
                           <Button variant="filled" endIcon={<ChangeCircleIcon/>} sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => SimulhandleSendClick(currentImageIndex,simulatedImage)}>
@@ -696,20 +718,11 @@ const handleFurnitureButtonClick = () => {
               <RestartAltIcon></RestartAltIcon>
         </Button></Box> */}
 
-        <Container sx={{ py: 1 }} maxWidth={false}>
-          <Grid Grid container spacing={2}>
+        <Container sx={{ py: 0 }} maxWidth={false}>
+          <Grid Grid container spacing={1}>
           <Grid item xs={0.3}></Grid>
             <Grid item xs={1.7}>
-            {serverResponse && serverResponse["Mean Predict"] !== null && (
-            <>
-                <br />
-                광원의 평균 색온도: {serverResponse["Mean Predict"]}
-                <br />
-                <Typography variant="body2" sx={{ fontWeight: 'lighter' }}>
-                    색온도: {serverResponse["Predict"].join(', ')}
-                </Typography>
-            </>
-              )}
+            
               <Card
                 sx={{ width: '400px', height: '240px', display: 'flex', flexDirection: 'column', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
@@ -826,7 +839,7 @@ const handleFurnitureButtonClick = () => {
               <Box sx={{ mb: 1 }} />
             </>
            )}
-            <Box sx={{ mb: 1 }} />
+            <Box sx={{ mb: 2.5 }} />
             <Grid item>
               <Button variant="outlined" sx={{ borderColor: '#000', color: '#000', fontWeight: 'bold',marginLeft : '310px' }} endIcon={<SendIcon />} 
               onClick={handleSendClick}
@@ -841,7 +854,7 @@ const handleFurnitureButtonClick = () => {
           </Grid>
           <Grid item xs={0.7}></Grid>
           <Grid item xs={9.3}>
-            <Grid container spacing={5}>
+            <Grid container spacing={9}>
               {currentImagePaths.map((imgPath, index) => (
               // 카드 크기에 맞춰서 줌인
               <Grid item xs={3} key={index}>
@@ -893,7 +906,7 @@ const handleFurnitureButtonClick = () => {
                             gap: 10 
                           }}
                         >
-                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '50px'}}>
+                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '15px'}}>
                         <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000' }}>Original Image</Typography>
                       </Card>
                       <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>
@@ -933,8 +946,9 @@ const handleFurnitureButtonClick = () => {
                           sx={{ width: '360px', color: '#000' }} 
                           max={7500} min={2850}
                           marks={[
-                          { value: 2850, label: '2850k' },
-                          { value: 7500, label: '7500k' },
+                            { value: 2850, label: <Typography style={{ fontSize: '18px', fontWeight: 'bold' }}>2850k</Typography> },
+                            { value: 7500, label: <Typography style={{ fontSize: '18px' , fontWeight: 'bold'}}>7500k</Typography> },
+                      
                         ]} />
                       <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={() => toggleSelectImage(dialogImage, simulatedImage)}>
                           { cartImages.some(pair => pair.original === dialogImage) ?  (
