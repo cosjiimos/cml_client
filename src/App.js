@@ -518,18 +518,40 @@ const handleFurnitureButtonClick = () => {
 
   //웹페이지 시작!
   const [showWebpage, setShowWebpage] = useState(false);
-  const handleToggleWebpage = () => {
+  const handleToggleWebpage = async () => {
     setShowWebpage((prevValue) => !prevValue);
     const currentTime = new Date().toLocaleTimeString();
-    console.log('Start time:', currentTime)
-
-  //현재 시각 보내기(Start & End)
+    starttime(currentTime)
   };
+
+
+  async function starttime(currentTime) {
+    try {
+      console.log('Start Time :', currentTime);
+      const response = await axios.post('/starttime', {
+        currentTime : currentTime 
+      });
+      //console.log(response.data);
+    } catch (error) {
+    }
+  }
+
+  //현재 시각 보내기(End)
   const handlePrintTime = () => {
     const currentTime = new Date().toLocaleTimeString();
-    console.log('End time:', currentTime);
-    
+    endtime(currentTime)
   };
+
+  async function endtime(currentTime) {
+    try {
+      console.log('End Time :', currentTime);
+      const response = await axios.post('/endtime', {
+        currentTime : currentTime 
+      });
+      //console.log(response.data);
+    } catch (error) {
+    }
+  }
 
  //버튼&슬라이더 변경! 
   return ( 
