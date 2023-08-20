@@ -107,28 +107,58 @@ export default function Album () {
 
   // 결과 이미지를 가져오는 함수
   async function fetchImages(back, furn, pageNum, image) {
+
+    //const isBackDetailedSliderEnabled = Back_controls.some(control => control.disabled === false);
+    const isBackDetailedSliderEnabled = Back_controls.some(control => control.disabled === false) && back.some(val => val !== null); 
+    //const isFurnDetailedSliderEnabled = Furn_controls.some(control => control.disabled === false); 
+    const isFurnDetailedSliderEnabled = Furn_controls.some(control => control.disabled === false) && furn.some(val => val !== null);
+  
+    const backToggleValue = isBackDetailedSliderEnabled ? 1 : 0;
+    const furnToggleValue = isFurnDetailedSliderEnabled ? 1 : 0;
+
     try {
       const response = await axios.post('/get_images', { 
         back_weight: back,
         furn_weight: furn,
         pageNum:pageNum,
-        target_image_name : image
+        target_image_name : image,
+        back_toggle: backToggleValue,
+        furn_toggle: furnToggleValue
        });
        const imagesFromServer = response.data.images;
-      //  console.log('cI: ', imagesFromServer);
+       filterLogToServer(back, furn, pageNum, image, imagesFromServer, backToggleValue, furnToggleValue); // [로그 저장]
        setCurrentImages(imagesFromServer);
 
     } catch (error) {
       console.error('Error fetching images:', error);
     }
   };
+  ///// [로그 저장1] 타겟이미지와 필터 로그 저장 코드! 
+
+  async function filterLogToServer(back, furn, pageNum, image, sortedPaths, backToggle, furnToggle) {
+    try {
+        await axios.post('/filter_save_log', {
+            back_weight: back,
+            furn_weight: furn,
+            pageNum: pageNum,
+            target_image_name: image,
+            sorted_image_paths: sortedPaths,
+            back_toggle: backToggle,
+            furn_toggle: furnToggle
+        });
+    } catch (error) {
+        console.error('Error saving log:', error);
+    }
+  };
 
   //시뮬레이션 이미지와 슬라이더 바의 값을 가져오는 함슈
-  async function SimulationDataToServer (simulImage, cctValues){
+  async function SimulationDataToServer (simulImage, cctValues, location, backgroundImage){
     try {
       const response = await axios.post('/simulation',{
         simulImage: simulImage,
         cctValues: cctValues,
+        location: location,  // 위치 정보 추가
+        backgroundImage: backgroundImage
       });
       console.log(response.data)
       setSimulatedImage(response.data.image); // 받은 이미지를 상태로 설정
@@ -155,7 +185,7 @@ export default function Album () {
     setSimulatedImages(newSimulatedImages);
 
     // Send 버튼을 누르면 서버로 데이터 전송
-    SimulationDataToServer(dialogImage, simsliderValue);
+    SimulationDataToServer(dialogImage, simsliderValue, "cart_send");
     console.log('cart_simulation send', dialogImage, simsliderValue)
 };
 
@@ -164,12 +194,19 @@ export default function Album () {
     const updatedSimulatedImages = [...simulatedImages];
     updatedSimulatedImages[index] = dialogImage; // 원래 이미지로 복구
     setSimulatedImages(updatedSimulatedImages);
+    SimulationDataToServer(dialogImage, simsliderValue, "cart_cancel");
   };
 
 
   useEffect(() => {
-    if(simsliderValue !== null) {
-      SimulationDataToServer(dialogImage, simsliderValue)
+    if(simsliderValue !== null && dialogImage !== null) {
+      let location = "0"
+        if (openDialog) {
+          location = "dialog";
+      } else if (openCartDialog) {
+          location = "cart";
+      }
+      SimulationDataToServer(dialogImage, simsliderValue, location);
     }
     ; // simsliderValue 값이 변경될 때마다 서버로 전송
   }, [simsliderValue, dialogImage]);
@@ -183,9 +220,9 @@ export default function Album () {
     setOpenDialog(true);
     lightsourceCCT(imagePath); //셈 slightsource
     // console.log("lightsourceCCT_imagePath", imagePath);
-    if(simsliderValue !== null) {
-    SimulationDataToServer(imagePath, simsliderValue);
-    }
+    // if(simsliderValue !== null) {
+    // SimulationDataToServer(imagePath, simsliderValue, "dialog");
+    // }
   };
 
   const [imageDefault, setImageDefault] = useState('');
@@ -199,9 +236,9 @@ export default function Album () {
     setOpenCartDialog(true);
     lightsourceCCT(imagePath); //셈 slightsource
     // console.log("lightsourceCCT2_imagePath", imagePath);
-    if(simsliderValue !== null) {
-    SimulationDataToServer(imagePath, simsliderValue);
-    }
+    // if(simsliderValue !== null) {
+    // SimulationDataToServer(imagePath, simsliderValue, "cart");
+    // }
   };
   
   const CarthandleDialogClose = () => {
@@ -328,28 +365,19 @@ const handleFurnitureButtonClick = () => {
   };
 
 
-  // const toggleSelectImage = (image) => {
-  //   if (cartImages.includes(image)) {
-  //     setcartImages(prev => prev.filter(img => img !== image));
-  //   } else {
-  //     setcartImages(prev => [...prev, image]);
-  //   }
-  // };
+    // [로그 저장 2]  장바구니 이미지와 Background (Target) 이미지를 받아오는 함수 
+    async function CartDataToServer (originalCart, targetImage){
+      try {
+        const response = await axios.post('/cartData',{
+          originalCart: originalCart
+        });
+        console.log(response.data)
+    } catch (error) {
+      console.error('Error CartDataToServer :', error);
+    }
+  };
 
-    //"작성중" 장바구니 이미지와 simulated cart이미지를 받아오는 함수 
-  //   async function CartDataToServer (originalCart, simulatedCart){
-  //     try {
-  //       const response = await axios.post('/cartData',{
-  //         originalCart: originalCart,
-  //         simulatedCart: simulatedCart,
-  //       });
-  //       console.log(response.data)
-  //   } catch (error) {
-  //     console.error('Error CartDataToServer :', error);
-  //   }
-  // };
-
-  //장바구니 이미지를 서버로 보내서 cct값을 받아오는 함수
+  //장바구니 이미지를 서버로 보내서 광원의 cct값을 받아오는 함수
   const [serverResponse, setServerResponse] = useState(null); 
   async function lightsourceCCT (cctimage){
     try {
@@ -365,7 +393,6 @@ const handleFurnitureButtonClick = () => {
 
   const toggleSelectImage = (originalImage, simulatedImage) => {
     const imagePair = { original: originalImage, simulated: simulatedImage };
-  
     // 이미 배열에 해당 원본 이미지가 있는지 확인
     const existingPairIndex = cartImages.findIndex(
       imgPair => imgPair.original === originalImage
@@ -380,12 +407,18 @@ const handleFurnitureButtonClick = () => {
     } else {
       // 존재하지 않으면 추가
       setcartImages(prev => [...prev, imagePair]);
+      if (simsliderValue !== null) {
+        SimulationDataToServer(dialogImage, simsliderValue, "dialog_send");
+    }
     }
   };
 
   // 셈 : cartImage 로그 
   useEffect(() => {
     console.log('cartImages :', cartImages);
+    if (cartImages.length > 0) {
+      CartDataToServer(cartImages);
+  }
   }, [cartImages])
 
   const handleUpClick = () => {
@@ -423,19 +456,6 @@ const handleFurnitureButtonClick = () => {
   ];
 
 
-//   const CustomSlider = styled(Slider)`
-//   & .MuiSlider-thumb {
-//     width: 20px;
-//     height: 20px;
-//   }
-//   & .MuiSlider-track {
-//     height: ${props => 5 - Math.abs(props.value)}px; // 중앙에서 가장 두꺼워지도록 함
-//     background: currentColor;
-//   }
-//   & .MuiSlider-rail {
-//     height: 1px; // 최대 두께로 설정
-//   }
-// `;
  
   // 잘 나와요 : cards_5294632()   cards_23386963(brief1 : 사진 1)  cards_19557257(블랙소파)  cards_20309937  cards_12640188  cards_2366740 cards_7804689
   // 세민 궁금해요 : cards_21561263, cards_20394197 cards_12137732
@@ -512,35 +532,29 @@ const handleFurnitureButtonClick = () => {
   const isSendEnabled = () => {
     return backSliderValues.some(value => value !== null) || furnSliderValues.some(value => value !== null);
   };
-  function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
 
   //웹페이지 시작!
   const [showWebpage, setShowWebpage] = useState(false);
-  const handleToggleWebpage = async () => {
+
+  async function handleToggleWebpage  (){
     setShowWebpage((prevValue) => !prevValue);
-    const currentTime = new Date().toLocaleTimeString();
-    starttime(currentTime)
-  };
-
-
-  async function starttime(currentTime) {
-    try {
-      console.log('Start Time :', currentTime);
-      const response = await axios.post('/starttime', {
-        currentTime : currentTime 
+    try{
+      const response = await axios.post('/starttime',{
       });
-      //console.log(response.data);
     } catch (error) {
+      console.error('Error sending start time:', error);
     }
-  }
-
-  //현재 시각 보내기(End)
-  const handlePrintTime = () => {
-    const currentTime = new Date().toLocaleTimeString();
-    endtime(currentTime)
   };
+
+  async function handlePrintTime  (){
+    try{
+      const response = await axios.post('/endtime',{
+      });
+    } catch (error) {
+      console.error('Error sending end time:', error);
+    }
+  };
+
 
   async function endtime(currentTime) {
     try {
