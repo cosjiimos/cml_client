@@ -460,7 +460,7 @@ const handleFurnitureButtonClick = () => {
   // 세민 궁금해요 : cards_21561263, cards_20394197 cards_12137732
   // 유경 궁금해요 : cards_8486233 cards_17760123 cards_4143928 cards_10687665
   const loadDefaultImage = async () => {
-    const image = await import('./img/cards_12640188.jpg');
+    const image = await import('./img/cards_19557257.jpg');
     setBackgroundImage(image.default);
     console.log("image", image.default)
     selectedImageToServer(image.default);
