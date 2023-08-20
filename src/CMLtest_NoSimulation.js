@@ -36,7 +36,15 @@ const darkTheme = createTheme({
 export default function Album () {
 
   // 타겟 이미지 변경!  
-  // 잘 나와요 : cards_5294632()   cards_23386963(brief1 : 사진 1)  cards_19557257(블랙소파)  cards_20309937  cards_12640188  cards_2366740 cards_7804689
+  // Simulation  =====   cards_5294632 
+
+  //  Test  |      Brief1      |     Brief 2
+  // TF (S) |  cards_20309937  |  cards_12640188
+  // DM (S) |  cards_23386963  |  cards_7804689
+  // TF (N) |  cards_19557257  |  cards_23667400
+  // DM (N) |  cards_16811768  |  cards_20804082
+
+
   const loadDefaultImage = async () => {
   const image = await import('./img/cards_23386963.jpg');
   setBackgroundImage(image.default);
@@ -651,7 +659,7 @@ const handleFurnitureButtonClick = () => {
                   <Grid item xs={12} sm={4} md={4} lg={2} key={index}>
                     <Card
                       sx={{
-                        width: '100%',
+                        width: '90%',
                         height: '240px',
                         backgroundImage: `url(${simulatedImages[index] || imgPair.simulated || imgPair.original})`, // 시뮬레이션 이미지가 없으면 원래 이미지 사용
                         backgroundSize: 'cover',
