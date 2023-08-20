@@ -1,6 +1,14 @@
-import T from "./Tutorial.js";
-import S from "./CMLtest_Simulation.js"
-import N from "./CMLtest_NoSimulation.js"
+import S_DM_1 from "./S_DM_1.js";
+import S_DM_2 from "./S_DM_2.js"
+import S_TF_1 from "./S_TF_1.js"
+import S_TF_2 from "./S_TF_2.js"
+
+import N_DM_1 from "./N_DM_1.js";
+import N_DM_2 from "./N_DM_2.js"
+import N_TF_1 from "./N_TF_1.js"
+import N_TF_2 from "./N_TF_2.js"
+
+import T from "./Tutorial.js"
 //    CMLtest_NoSimulation   CMLtest_NoSimulation     Tutorial
 import React, { useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -29,12 +37,14 @@ export default function App() {
   const [showAlbum, setShowAlbum] = useState(false);
   const [p_no, setP_no] = useState('');
   const [system, setSystem] = useState('');
+  const [type, setType] = useState('');
   async function exp_info() {
-    if (p_no && (system === 'simul' || system === 'nosimul' || system === 'tutorial')) {
+    if (p_no && (system === 'simul' || system === 'nosimul' || system === 'tutorial') && (type === 'TF' || type === 'DM')) {
       try {
         const response = await axios.post('/exp_info', {
           p_no:p_no,
-          system:system
+          system:system,
+          type : type
         });
         setShowAlbum(true);
       } catch (e) {
@@ -63,15 +73,35 @@ export default function App() {
                         <MenuItem value="T">T</MenuItem> 
                     </Select>
                 </FormControl>
+                <FormControl variant="filled" sx={{ m: 1, minWidth: 120 }}>
+                    <InputLabel id="type-label">Type</InputLabel>
+                    <Select
+                        labelId="type-label"
+                        id="type-select"
+                        value={type}
+                        onChange={(e) => setType(e.target.value)}
+                    >
+                        <MenuItem value="TF">TF_1</MenuItem>
+                        <MenuItem value="TF">TF_2</MenuItem>
+                        <MenuItem value="DM">DM_1</MenuItem>
+                        <MenuItem value="DM">DM_2</MenuItem>
+                    </Select>
+                </FormControl>
                 <TextField label="p_no" variant="filled" value={p_no} onChange={(e) => setP_no(e.target.value)} sx={{ m: 1 }} />
             </div>
             <Button sx={{ mt: 2, width:'10%'}} disabled={!p_no || !system} onClick={() => exp_info()} variant="contained" color="secondary">Start</Button>
         </Container>
         </ThemeProvider>
       )}
-      {showAlbum && system === "S" && <simul />}
-      {showAlbum && system === "N" && <nosimul />}
-      {showAlbum && system === "Y" && <tutorial />}
+      {showAlbum && system === "S" && type === 'TF_1' && <S_TF_1/>}
+      {showAlbum && system === "S" && type === 'TF_2' && <S_TF_2/>}
+      {showAlbum && system === "S" && type === 'DM_1' && <S_DM_1/>}
+      {showAlbum && system === "S" && type === 'DM_2' && <S_DM_2/>}
+      {showAlbum && system === "N" && type === 'TF_1' && <N_TF_1/>}
+      {showAlbum && system === "N" && type === 'TF_2' && <N_TF_2/>}
+      {showAlbum && system === "N" && type === 'DM_1' && <N_DM_1/>}
+      {showAlbum && system === "N" && type === 'DM_2' && <N_DM_2/>}
+      {showAlbum && system === "T" && <T/>}
     </div>
   );
 }
