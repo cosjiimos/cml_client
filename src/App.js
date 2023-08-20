@@ -15,7 +15,7 @@ import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 
 
-axios.defaults.baseURL = "http://166.104.34.158:5010";
+axios.defaults.baseURL = "http://166.104.34.158:5012";
 axios.defaults.headers.post["content-Type"] = "application/json;charset=utf-8"
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*"
 
@@ -69,9 +69,9 @@ export default function App() {
         </Container>
         </ThemeProvider>
       )}
-      {showAlbum && system === "S" && <simul />}
-      {showAlbum && system === "N" && <nosimul />}
-      {showAlbum && system === "Y" && <tutorial />}
+      {showAlbum && system === "S" && <S/>}
+      {showAlbum && system === "N" && <N/>}
+      {showAlbum && system === "T" && <T/>}
     </div>
   );
 }
