@@ -39,14 +39,14 @@ export default function Album () {
   // Simulation  =====   cards_5294632 
 
   //  Test  |      Brief1      |     Brief 2
-  // (S) TF |  cards_20309937  |  cards_12640188
-  // (S) DM |  cards_23386963  |  cards_7804689
-  // (N) TF |  cards_19557257  |  cards_23667400
-  // (N) DM |  cards_16811768  |  cards_20804082
+  // (S) TF |  cards_23667400  |  cards_12640188
+  // (S) DM |  cards_16811768  |  cards_7804689
+  // (N) TF |  cards_12640188  |  cards_23667400
+  // (N) DM |  cards_7804689   |  cards_16811768
 
 
   const loadDefaultImage = async () => {
-  const image = await import('./img/cards_19557257.jpg');
+  const image = await import('./img/cards_12640188.jpg');
   setBackgroundImage(image.default);
   console.log("image", image.default)
   selectedImageToServer(image.default);
