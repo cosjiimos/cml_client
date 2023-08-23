@@ -9,7 +9,7 @@ import Slider from '@mui/material/Slider';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useEffect } from 'react';
-import React, { useState } from 'react'; 
+import React, {useState } from 'react'; 
 import axios from 'axios';
 import { IconButton } from '@mui/material';
 import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
@@ -18,8 +18,10 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import SendIcon from '@mui/icons-material/Send';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import CloseIcon from '@mui/icons-material/Close';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ImageSearchIcon from '@mui/icons-material/ImageSearch';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 axios.defaults.baseURL = "http://166.104.34.158:5010";
@@ -39,19 +41,23 @@ export default function Album () {
   // Simulation  =====   cards_5294632 
 
   //  Test  |      Brief1      |     Brief 2
-  // TF (S) |  cards_20309937  |  cards_12640188
-  // DM (S) |  cards_23386963  |  cards_7804689
-  // TF (N) |  cards_19557257  |  cards_23667400
-  // DM (N) |  cards_16811768  |  cards_20804082
+  // (S) TF |  cards_23667400  |  cards_12640188
+  // (S) DM |  cards_16811768  |  cards_7804689
+  // (N) TF |  cards_12640188  |  cards_23667400
+  // (N) DM |  cards_7804689   |  cards_16811768
 
-  const loadDefaultImage = async () => {
-  const image = await import('./img/cards_5294632.jpg');
-  setBackgroundImage(image.default);
-  console.log("image", image.default)
-  selectedImageToServer(image.default);
-  lightsourceCCT(image.default);
-  setImageDefault(image.default);
-  setPageNum(0);
+
+    const loadDefaultImage = async () => {
+    const image = await import('./img/cards_5294632.jpg');
+    setBackgroundImage(image.default);
+    console.log("image", image.default)
+    selectedImageToServer(image.default);
+    lightsourceCCT(image.default);
+    setImageDefault(image.default);
+    setPageNum(0);
+
+
+
 
 
 
@@ -167,13 +173,31 @@ export default function Album () {
         furn_toggle: furnToggleValue
        });
        const imagesFromServer = response.data.images;
+       filterLogToServer(back, furn, pageNum, image, imagesFromServer, backToggleValue, furnToggleValue); // [로그 저장]
        setCurrentImages(imagesFromServer);
 
     } catch (error) {
       console.error('Error fetching images:', error);
     }
   };
-  
+  ///// [로그 저장1] 타겟이미지와 필터 로그 저장 코드! 
+
+  async function filterLogToServer(back, furn, pageNum, image, sortedPaths, backToggle, furnToggle) {
+    try {
+        await axios.post('/filter_save_log', {
+            back_weight: back,
+            furn_weight: furn,
+            pageNum: pageNum,
+            target_image_name: image,
+            sorted_image_paths: sortedPaths,
+            back_toggle: backToggle,
+            furn_toggle: furnToggle
+        });
+    } catch (error) {
+        console.error('Error saving log:', error);
+    }
+  };
+
   //시뮬레이션 이미지와 슬라이더 바의 값을 가져오는 함슈
   async function SimulationDataToServer (simulImage, cctValues, location, backgroundImage){
     try {
@@ -388,6 +412,17 @@ const handleFurnitureButtonClick = () => {
   };
 
 
+    // [로그 저장 2]  장바구니 이미지와 Background (Target) 이미지를 받아오는 함수 
+    async function CartDataToServer (originalCart, targetImage){
+      try {
+        const response = await axios.post('/cartData',{
+          originalCart: originalCart
+        });
+        console.log(response.data)
+    } catch (error) {
+      console.error('Error CartDataToServer :', error);
+    }
+  };
 
   //장바구니 이미지를 서버로 보내서 광원의 cct값을 받아오는 함수
   const [serverResponse, setServerResponse] = useState(null); 
@@ -425,7 +460,13 @@ const handleFurnitureButtonClick = () => {
     }
   };
 
-
+  // 셈 : cartImage 로그 
+  useEffect(() => {
+    console.log('cartImages :', cartImages);
+    if (cartImages.length > 0) {
+      CartDataToServer(cartImages);
+  }
+  }, [cartImages])
 
   const handleUpClick = () => {
     setPageNum(pageNum - 1); 
@@ -461,6 +502,8 @@ const handleFurnitureButtonClick = () => {
     { value: 50, label: <CustomizedMark label="similiar" align="right" /> },
   ];
 
+
+  
   useEffect(() => {
     loadDefaultImage();
   }, []);
@@ -510,11 +553,34 @@ const handleFurnitureButtonClick = () => {
 
   async function handleToggleWebpage  (){
     setShowWebpage((prevValue) => !prevValue);
+    try{
+      const response = await axios.post('/starttime',{
+      });
+    } catch (error) {
+      console.error('Error sending start time:', error);
+    }
+  };
+
+  async function handlePrintTime  (){
+    try{
+      const response = await axios.post('/endtime',{
+      });
+    } catch (error) {
+      console.error('Error sending end time:', error);
+    }
   };
 
 
-
-
+  async function endtime(currentTime) {
+    try {
+      console.log('End Time :', currentTime);
+      const response = await axios.post('/endtime', {
+        currentTime : currentTime 
+      });
+      //console.log(response.data);
+    } catch (error) {
+    }
+  }
 
  //버튼&슬라이더 변경! 
   return ( 
@@ -586,7 +652,7 @@ const handleFurnitureButtonClick = () => {
                  <Box>
                   <Button
                     variant="outlined"
-                    sx={{ fontWeight: 'bold', width: '90px', height: '40px', color: 'gray', borderColor: 'gray' }}>
+                    sx={{ fontWeight: 'bold', width: '90px', height: '40px', color: 'gray', borderColor: 'gray' }} onClick={handlePrintTime}>
                     End
                   </Button>
                 </Box>
@@ -622,8 +688,101 @@ const handleFurnitureButtonClick = () => {
                                 <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
                             )}
                         </Button>
+                          {/* // 시뮬레이션  */}
+                          <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => { 
+                              CarthandleDialogOpen(imgPair.original); 
+                              setCurrentImageIndex(index);
+                          }}>
+                              <AutoFixHighIcon fontSize="small" />
+                          </Button>
 
-      
+
+                  
+
+                
+
+
+                <Dialog open={openCartDialog} onClose={CarthandleDialogClose} maxWidth="false" PaperProps={{
+                  style: {
+                    height: '80%', 
+                    width: '80%', 
+                  },
+                }}>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={CarthandleDialogClose}>
+                      <CloseIcon />
+                    </Button>
+                  </Box>
+                  <Box sx={{ display: 'flex', height: '100%',marginTop : '100px' }}>
+                  <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column', // 세로 방향으로 정렬
+                          alignItems: 'center', // 가운데 정렬
+                          gap: 10 // 카드와 슬라이더 사이의 간격
+                        }}
+                      >
+                    <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '15px'}}>
+                      <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000',fontFamily: '"futura", sans-serif',fontWeight: 'bold'}}>Original Image</Typography>
+                    </Card>
+                    <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>
+                    {serverResponse && serverResponse["Mean Predict"] !== null && (
+                          <>
+                              <br />
+                              광원의 평균 색온도: {serverResponse["Mean Predict"]}
+                              <br />
+                              <Typography variant="body2" sx={{ fontWeight: 'lighter' }}>
+                                  색온도: {serverResponse["Predict"].join(', ')}
+                              </Typography>
+                          </>
+                      )}
+                    </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column', // 세로 방향으로 정렬
+                        alignItems: 'center', // 가운데 정렬
+                        gap: 10 // 카드와 슬라이더 사이의 간격
+                        , marginLeft: '200px'
+                      }}
+                    >
+                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${simulatedImage})`, backgroundSize: 'cover', 
+                      backgroundPosition: 'center' }}>
+                        <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '1380px', color: '#000' ,fontWeight: 'bold'}}>Simulation Image</Typography>
+                      </Card>
+                      
+                      <Slider 
+                        value={simsliderValue}
+                        onChange={handleSimulationChange} 
+                        defaultValue={2850}
+                        aria-label="Default" 
+                        valueLabelDisplay="auto" 
+                        size="large" 
+                        sx={{ width: '360px', color: '#000' }} 
+                        max={7500} min={2850}
+                        marks={[
+                          { value: 2850, label: <Typography style={{ fontSize: '18px', fontWeight: 'bold' }}>2850k</Typography> },
+                          { value: 7500, label: <Typography style={{ fontSize: '18px' , fontWeight: 'bold'}}>7500k</Typography> },
+                    
+                      ]} />
+                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
+                        <Button variant="filled" endIcon={<ChangeCircleIcon/>} sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => SimulhandleSendClick(currentImageIndex,simulatedImage)}>
+                        simulation image
+                        </Button>
+                        <Button variant="filled" endIcon={<RestartAltIcon/>} sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => SimulhandleResetClick(currentImageIndex,dialogImage )}>
+                      origirnal image
+                    </Button>
+                        
+                      </Box>
+                    </Box>
+                  
+                </Box>
+              </Dialog>
+
+
+                
                 </Box>
                   </Card>
                   </Grid>
@@ -811,7 +970,97 @@ const handleFurnitureButtonClick = () => {
                     )}
                   </Button>
 
-                
+                {/* // 시뮬레이션  */}
+                <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => handleDialogOpen(imgPath)}>
+                  <AutoFixHighIcon fontSize="small" />
+                </Button>
+
+
+
+
+                <Dialog open={openDialog} onClose={handleDialogClose} maxWidth="false" PaperProps={{
+                  style: {
+                    height: '80%', 
+                    width: '80%', 
+                  },
+                  }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 3 }}>
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={handleDialogClose}>
+                      <CloseIcon />
+                    </Button>
+                  </Box>
+                  <Box sx={{ display: 'flex', height: '100%',marginTop : '100px'  }}>
+                  <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column', // 세로 방향으로 정렬
+                          alignItems: 'center', // 가운데 정렬
+                          gap: 10 
+                        }}
+                      >
+                    <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${dialogImage})`, backgroundSize: 'cover', backgroundPosition: 'center', marginLeft: '200px',marginBottom : '15px'}}>
+                      <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '480px', color: '#000' }}>Original Image</Typography>
+                    </Card>
+                    <Typography variant="h6" sx={{ textAlign: 'center', width: '100%', marginLeft: '200px' , fontWeight: 'bold'}}>
+                    {serverResponse && serverResponse["Mean Predict"] !== null && (
+                          <>
+                              <br />
+                              광원의 평균 색온도: {serverResponse["Mean Predict"]}
+                              <br />
+                              <Typography variant="body2" sx={{ fontWeight: 'lighter' }}>
+                                  색온도: {serverResponse["Predict"].join(', ')}
+                              </Typography>
+                          </>
+                      )}
+                  </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column', // 세로 방향으로 정렬
+                        alignItems: 'center', // 가운데 정렬
+                        gap: 10 // 카드와 슬라이더 사이의 간격
+                        , marginLeft: '200px'
+                      }}
+                    >
+                      <Card sx={{ width: '720px', height: '480px', backgroundImage: `url(${simulatedImage})`, backgroundSize: 'cover', 
+                      backgroundPosition: 'center' }}>
+                        <Typography variant="h5" sx={{ position: 'absolute', top: '100px', left: '1380px', color: '#000' }}>Simulation Image</Typography>
+                      </Card>
+                      
+                      <Slider 
+                        value={simsliderValue}
+                        onChange={handleSimulationChange} 
+                        defaultValue={2850}
+                        aria-label="Default" 
+                        valueLabelDisplay="auto" 
+                        size="large" 
+                        sx={{ width: '360px', color: '#000' }} 
+                        max={7500} min={2850}
+                        marks={[
+                          { value: 2850, label: <Typography style={{ fontSize: '18px', fontWeight: 'bold' }}>2850k</Typography> },
+                          { value: 7500, label: <Typography style={{ fontSize: '18px' , fontWeight: 'bold'}}>7500k</Typography> },
+                    
+                      ]} />
+                    <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold', padding: '2px 3px' }} onClick={() => toggleSelectImage(dialogImage, simulatedImage)}>
+                        { cartImages.some(pair => pair.original === dialogImage) ?  (
+                            <>
+                              Simulated Image {/* 선택된 경우의 텍스트 */}
+                              <RemoveShoppingCartIcon fontSize="large" /> {/* 이미지가 선택된 경우 */}   
+                            </>
+                        ) : (
+                            <>
+                              Simulated Image {/* 선택되지 않은 경우의 텍스트 */}
+                              <AddShoppingCartIcon fontSize="large" /> {/* 이미지가 선택되지 않은 경우 */}
+                            </>
+                        )}
+                    </Button>
+                    </Box>
+                  </Box>
+                </Box>
+              </Dialog>
+
 
                 </Box>
               </Card>
