@@ -276,8 +276,11 @@ export default function Album () {
   const handleDialogClose = () => {
     setOpenDialog(false);
     lightsourceCCT(imageDefault);
+    setSimsliderValue(null);
+    setSimulatedImage(null);
+    
   };
-
+ 
   const CarthandleDialogOpen = (imagePath) => {
     setDialogImage(imagePath);
     setOpenCartDialog(true);
@@ -290,6 +293,8 @@ export default function Album () {
   
   const CarthandleDialogClose = () => {
     setOpenCartDialog(false);
+    setSimsliderValue(null);
+    setSimulatedImage(null);
   };
 
 
@@ -409,6 +414,9 @@ const handleFurnitureButtonClick = () => {
   
   const handleCloseSelectedImages = () => {
     setViewSelectedImages(false);
+    setSimsliderValue(null);
+    setSimulatedImage(null);
+
   };
 
 

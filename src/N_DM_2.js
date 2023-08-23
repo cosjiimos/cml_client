@@ -9,7 +9,7 @@ import Slider from '@mui/material/Slider';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useEffect } from 'react';
-import React, { useState } from 'react'; 
+import React, {useState } from 'react'; 
 import axios from 'axios';
 import { IconButton } from '@mui/material';
 import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
@@ -18,8 +18,10 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import SendIcon from '@mui/icons-material/Send';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import CloseIcon from '@mui/icons-material/Close';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ImageSearchIcon from '@mui/icons-material/ImageSearch';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 axios.defaults.baseURL = "http://166.104.34.158:5010";
@@ -45,15 +47,17 @@ export default function Album () {
   // (N) DM |  cards_7804689   |  cards_16811768
 
 
+    const loadDefaultImage = async () => {
+    const image = await import('./img/cards_16811768.jpg');
+    setBackgroundImage(image.default);
+    console.log("image", image.default)
+    selectedImageToServer(image.default);
+    lightsourceCCT(image.default);
+    setImageDefault(image.default);
+    setPageNum(0);
 
-  const loadDefaultImage = async () => {
-  const image = await import('./img/cards_16811768.jpg');
-  setBackgroundImage(image.default);
-  console.log("image", image.default)
-  selectedImageToServer(image.default);
-  lightsourceCCT(image.default);
-  setImageDefault(image.default);
-  setPageNum(0);
+
+
 
 
 
@@ -272,8 +276,11 @@ export default function Album () {
   const handleDialogClose = () => {
     setOpenDialog(false);
     lightsourceCCT(imageDefault);
+    setSimsliderValue(null);
+    setSimulatedImage(null);
+    
   };
-
+ 
   const CarthandleDialogOpen = (imagePath) => {
     setDialogImage(imagePath);
     setOpenCartDialog(true);
@@ -286,6 +293,8 @@ export default function Album () {
   
   const CarthandleDialogClose = () => {
     setOpenCartDialog(false);
+    setSimsliderValue(null);
+    setSimulatedImage(null);
   };
 
 
@@ -405,6 +414,9 @@ const handleFurnitureButtonClick = () => {
   
   const handleCloseSelectedImages = () => {
     setViewSelectedImages(false);
+    setSimsliderValue(null);
+    setSimulatedImage(null);
+
   };
 
 
@@ -498,6 +510,8 @@ const handleFurnitureButtonClick = () => {
     { value: 50, label: <CustomizedMark label="similiar" align="right" /> },
   ];
 
+
+  
   useEffect(() => {
     loadDefaultImage();
   }, []);
@@ -682,8 +696,8 @@ const handleFurnitureButtonClick = () => {
                                 <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
                             )}
                         </Button>
-
-      
+                         
+ 
                 </Box>
                   </Card>
                   </Grid>
@@ -870,9 +884,6 @@ const handleFurnitureButtonClick = () => {
                       <AddShoppingCartIcon fontSize="small" /> // 이미지가 선택되지 않은 경우
                     )}
                   </Button>
-
-                
-
                 </Box>
               </Card>
             </Grid>

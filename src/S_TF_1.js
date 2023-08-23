@@ -276,8 +276,11 @@ export default function Album () {
   const handleDialogClose = () => {
     setOpenDialog(false);
     lightsourceCCT(imageDefault);
+    setSimsliderValue(null);
+    setSimulatedImage(null);
+    
   };
-
+ 
   const CarthandleDialogOpen = (imagePath) => {
     setDialogImage(imagePath);
     setOpenCartDialog(true);
@@ -290,6 +293,8 @@ export default function Album () {
   
   const CarthandleDialogClose = () => {
     setOpenCartDialog(false);
+    setSimsliderValue(null);
+    setSimulatedImage(null);
   };
 
 
@@ -409,6 +414,9 @@ const handleFurnitureButtonClick = () => {
   
   const handleCloseSelectedImages = () => {
     setViewSelectedImages(false);
+    setSimsliderValue(null);
+    setSimulatedImage(null);
+
   };
 
 
@@ -459,6 +467,30 @@ const handleFurnitureButtonClick = () => {
     }
     }
   };
+
+
+  const updateSimulatedImageInCart = (originalImage, newSimulatedImage) => {
+    setcartImages(prev => {
+        // 해당 원본 이미지의 인덱스 찾기
+        const index = prev.findIndex(imgPair => imgPair.original === originalImage);
+
+        // 해당 원본 이미지가 존재하지 않는다면, 기존 배열을 반환
+        if (index === -1) return prev;
+
+        // 존재한다면, 해당 이미지 쌍을 업데이트
+        const updatedImgPair = { ...prev[index], simulated: newSimulatedImage };
+        return [
+            ...prev.slice(0, index),
+            updatedImgPair,
+            ...prev.slice(index + 1),
+        ];
+    });
+};
+
+
+
+
+
 
   // 셈 : cartImage 로그 
   useEffect(() => {
@@ -668,7 +700,7 @@ const handleFurnitureButtonClick = () => {
                       sx={{
                         width: '90%',
                         height: '240px',
-                        backgroundImage: `url(${simulatedImages[index] || imgPair.simulated || imgPair.original})`, // 시뮬레이션 이미지가 없으면 원래 이미지 사용
+                        backgroundImage: `url(${imgPair.simulated || imgPair.original})`, // 시뮬레이션 이미지가 없으면 원래 이미지 사용
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         margin: ' 20px'
@@ -678,7 +710,7 @@ const handleFurnitureButtonClick = () => {
 
                     {/* 오른쪽 위에 위치할 나머지 버튼들 */}
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
-                        <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(imgPair.original)}>
+                        <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => imghandleOpen(imgPair.simulated || imgPair.original)}>
                             <ImageSearchIcon fontSize="small" />
                         </Button>
                         <Button variant="filled" sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => toggleSelectImage(imgPair.original)}>
@@ -768,10 +800,16 @@ const handleFurnitureButtonClick = () => {
                     
                       ]} />
                       <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 0 }}>
-                        <Button variant="filled" endIcon={<ChangeCircleIcon/>} sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => SimulhandleSendClick(currentImageIndex,simulatedImage)}>
+                        <Button variant="filled" endIcon={<ChangeCircleIcon/>} sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => {
+                          updateSimulatedImageInCart(dialogImage, simulatedImage);
+                          SimulhandleSendClick(currentImageIndex, simulatedImage);
+                        }}>
                         simulation image
                         </Button>
-                        <Button variant="filled" endIcon={<RestartAltIcon/>} sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => SimulhandleResetClick(currentImageIndex,dialogImage )}>
+                        <Button variant="filled" endIcon={<RestartAltIcon/>} sx={{ color: '#666666', fontWeight: 'bold' }} onClick={() => {
+                          updateSimulatedImageInCart(dialogImage, dialogImage);
+                          SimulhandleSendClick(currentImageIndex, simulatedImage);
+                        }}>
                       origirnal image
                     </Button>
                         
